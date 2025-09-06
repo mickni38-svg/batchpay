@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BatchPay – temaer + modaler</title>
+  <style>
+    /* ---------- Theme Variables ---------- */
+    :root{
+      --bg:#07111a;
+      --panel:#0b1720;
+      --panel2:#0a141b;
+      --muted:#93a4b8;
+      --text:#e6f1f5;
+      --line:#113040;
+      --admin:#10b981; /* emerald 500 */
+      --accent:#34d399; /* emerald 400 */
+      --accent-strong:#059669; /* emerald 600 */
+      --chip:#0d2430;
+    }
+    body.theme-emerald{
+      --bg:#07111a; --panel:#0b1720; --panel2:#0a141b; --muted:#93a4b8; --text:#e6f1f5; --line:#113040;
+      --admin:#10b981; --accent:#34d399; --accent-strong:#059669; --chip:#0d2430;
+    }
+    body.theme-sapphire{
+      --bg:#070c19; --panel:#0b1026; --panel2:#0a0f1f; --muted:#9aa7d1; --text:#e7ecff; --line:#1a2759;
+      --admin:#3b82f6; --accent:#60a5fa; --accent-strong:#1d4ed8; --chip:#0b1337;
+    }
+    body.theme-violet{
+      --bg:#0d0816; --panel:#160d2a; --panel2:#120a22; --muted:#b7a8d9; --text:#f0eaff; --line:#2c1c58;
+      --admin:#a78bfa; --accent:#c4b5fd; --accent-strong:#7c3aed; --chip:#1a0f3b;
+    }
+    body.theme-sunset{
+      --bg:#100b06; --panel:#1a1209; --panel2:#150f0b; --muted:#d2b9a7; --text:#fff4ec; --line:#3a2514;
+      --admin:#f59e0b; --accent:#fbbf24; --accent-strong:#d97706; --chip:#24150a;
+    }
+
+    /* ---------- Base styles (use variables) ---------- */
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    .page{max-width:1150px;margin:24px auto;padding:0 16px}
+    .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 80px rgba(0,0,0,.35);overflow:hidden}
+    .header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid color-mix(in oklab, var(--line), transparent 25%)}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;
+      background:radial-gradient(120px 60px at -20% -20%, color-mix(in oklab, var(--admin), transparent 40%), transparent 60%), color-mix(in oklab, var(--panel), #000 12%);
+      border:1px solid var(--line); box-shadow:0 0 0 1px color-mix(in oklab, var(--accent), transparent 80%) inset;
+    }
+    .logo svg{width:22px;height:22px}
+    .title{font-size:18px;font-weight:800}
+    .merchant{font-size:12px;color:var(--muted)}
+    .rightHead{display:flex;align-items:center;gap:12px}
+    .swatches{display:flex;gap:8px;align-items:center}
+    .swLabel{font-size:12px;color:var(--muted)}
+    .sw{width:18px;height:18px;border-radius:50%;border:2px solid color-mix(in oklab, var(--text), transparent 70%);cursor:pointer;display:inline-block;box-shadow:0 0 0 2px color-mix(in oklab, #000, transparent 70%) inset}
+    .sw.emerald{background:linear-gradient(180deg,#34d399,#059669)}
+    .sw.sapphire{background:linear-gradient(180deg,#60a5fa,#1d4ed8)}
+    .sw.violet{background:linear-gradient(180deg,#c4b5fd,#7c3aed)}
+    .sw.sunset{background:linear-gradient(180deg,#fbbf24,#d97706)}
+
+    /* Top controls */
+    .topctl{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid color-mix(in oklab, var(--line), transparent 25%);background:var(--panel2)}
+    .toggle{position:relative;width:46px;height:26px;border-radius:999px;background:color-mix(in oklab, var(--panel), #000 25%);border:1px solid color-mix(in oklab, var(--line), #000 20%);cursor:pointer;flex-shrink:0}
+    .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:color-mix(in oklab, var(--accent), white 10%);transition:all .2s ease}
+    .toggle.on{background:color-mix(in oklab, var(--admin), #000 65%);border-color:color-mix(in oklab, var(--admin), black 65%)}
+    .toggle.on::after{left:25px;background:color-mix(in oklab, var(--accent), white 50%)}
+
+    /* Tabs (underline) */
+    .tabs{display:flex;gap:16px;background:var(--panel2);border-bottom:1px solid color-mix(in oklab, var(--line), transparent 25%);padding:8px 12px;overflow-x:auto}
+    .tab{appearance:none;background:transparent;border:none;color:color-mix(in oklab, var(--text), white 20%);padding:12px 4px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent}
+    .tab:focus{outline:none}
+    .tab.active{color:#fff;border-bottom-color:var(--accent)}
+    .content{padding:16px;display:grid;gap:12px}
+
+    /* Pills, buttons */
+    .pill{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid color-mix(in oklab, var(--admin), black 70%);color:color-mix(in oklab, var(--accent), white 30%);background:color-mix(in oklab, var(--admin), black 88%)}
+    .pill.ok{border-color:color-mix(in oklab, #16a34a, black 65%);color:color-mix(in oklab, #34d399, white 30%);background:color-mix(in oklab, #14532d, black 20%)}
+    .pill.warn{border-color:color-mix(in oklab, #f59e0b, black 70%);color:#fde68a;background:color-mix(in oklab, #f59e0b, black 85%)}
+    .pill.bad{border-color:#6b1111;color:#fecaca;background:#2a0b0b}
+    .muted{color:var(--muted);font-size:12px}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid color-mix(in oklab, var(--accent-strong), black 15%);background:color-mix(in oklab, var(--panel), #000 20%);color:var(--text);cursor:pointer}
+    .btn.primary{border-color:var(--accent-strong);background:linear-gradient(180deg,var(--admin),var(--accent-strong));color:#061a14;font-weight:700}
+    .btn.ghost{background:transparent;border-color:color-mix(in oklab, var(--line), white 5%)}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+
+    /* Toolbar */
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid var(--line);border-radius:12px;background:color-mix(in oklab, var(--panel2), #000 6%);margin-bottom:10px}
+    .toolbar.admin{background:color-mix(in oklab, var(--admin), black 92%);border-color:color-mix(in oklab, var(--admin), black 70%);box-shadow:0 0 0 1px color-mix(in oklab, var(--admin), black 80%) inset}
+
+    /* Order card */
+    .orderCard{position:relative;border:1px solid var(--line);background:color-mix(in oklab, var(--panel2), #000 6%);border-radius:18px;overflow:hidden;margin:10px 0;}
+    .orderCard::before{content:""; position:absolute; inset:-6px; border-radius:22px; border:2px solid color-mix(in oklab, var(--line), transparent 20%); opacity:.25; pointer-events:none;}
+    .orderCard.adminOwner{background:
+      radial-gradient(900px 240px at 0% 0%, color-mix(in oklab, var(--admin), transparent 90%), transparent 65%),
+      color-mix(in oklab, var(--panel2), #000 6%); border-color:color-mix(in oklab, var(--admin), black 70%);
+    }
+    .adminBoost .orderCard.adminOwner{ 
+      border-color:var(--admin);
+      box-shadow:0 0 0 2px color-mix(in oklab, var(--admin), black 70%) inset, 0 0 0 4px color-mix(in oklab, var(--admin), black 85%);
+    }
+    .adminBoost .orderCard.adminOwner::before{ opacity:.65; border-color:var(--admin); }
+    .adminBoost .orderCard.adminOwner::after{
+      content:""; position:absolute; left:0; top:0; bottom:0; width:8px;
+      background:linear-gradient(180deg,var(--accent),var(--admin)); 
+      box-shadow:0 0 22px color-mix(in oklab, var(--admin), black 40%); pointer-events:none;
+    }
+    .orderHead{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;cursor:pointer;background:color-mix(in oklab, var(--panel2), #000 2%)}
+    .adminBoost .orderCard.adminOwner .orderHead{ background:linear-gradient(90deg, color-mix(in oklab, var(--admin), transparent 55%), color-mix(in oklab, var(--panel2), #000 2%) 60%); }
+    .orderTitle{display:flex;align-items:center;gap:10px;min-width:0}
+    .chev{transition:transform .2s ease;flex:0 0 auto}
+    .orderCard.open .chev{transform:rotate(90deg)}
+    .orderBody{display:none;padding:12px 14px;border-top:1px dashed var(--line)}
+    .orderCard.open .orderBody{display:block}
+    .adminBadge{font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;color:color-mix(in oklab, var(--panel), #000 30%);background:linear-gradient(180deg,var(--accent),var(--admin));border:1px solid color-mix(in oklab, var(--admin), black 40%);box-shadow:0 2px 10px rgba(0,0,0,.25),0 0 0 1px color-mix(in oklab, var(--admin), black 70%) inset}
+
+    /* People accordion */
+    .acc{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .acc-item{border:1px solid var(--line);background:color-mix(in oklab, var(--panel2), #000 4%);border-radius:14px;overflow:hidden}
+    .acc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;cursor:pointer}
+    .acc-left{display:flex;align-items:center;gap:12px;min-width:0}
+    .avatar{width:28px;height:28px;border-radius:999px;background:color-mix(in oklab, var(--admin), black 85%);border:1px solid color-mix(in oklab, var(--admin), black 50%);display:flex;align-items:center;justify-content:center;font-size:12px;color:color-mix(in oklab, var(--accent), white 50%)}
+    .name{font-weight:600}
+    .status{font-size:12px}
+    .sum{font-variant-numeric:tabular-nums;white-space:nowrap}
+    .acc-body{padding:0 14px 12px 54px;background:color-mix(in oklab, var(--panel2), #000 6%);border-top:1px dashed var(--line);display:none}
+    .acc-item.open .acc-body{display:block}
+    .line-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:color-mix(in oklab, var(--panel2), #000 8%);padding:8px 10px;border-radius:10px;margin-top:8px;gap:12px}
+    .line-name{display:flex;flex-direction:column;min-width:0}
+    .line-amount{font-variant-numeric:tabular-nums;white-space:nowrap}
+    .switch{position:relative;width:44px;height:24px;background:color-mix(in oklab, var(--panel2), #000 12%);border:1px solid color-mix(in oklab, var(--line), #000 10%);border-radius:999px;cursor:pointer;flex-shrink:0}
+    .switch[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+    .switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:color-mix(in oklab, var(--accent), white 10%);border-radius:50%;transition:all .2s ease}
+    .switch.on{background:color-mix(in oklab, var(--admin), black 65%);border-color:color-mix(in oklab, var(--admin), black 55%)}
+    .switch.on::after{left:22px;background:color-mix(in oklab, var(--accent), white 50%)}
+
+    /* Items view */
+    .itemList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .itemCard{border:1px solid var(--line);background:color-mix(in oklab, var(--panel2), #000 4%);border-radius:12px;padding:10px 12px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:var(--chip);border:1px solid color-mix(in oklab, var(--accent), black 30%);color:color-mix(in oklab, var(--accent), white 40%);font-size:12px}
+
+    /* ---------- Modal ---------- */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+    .overlay.open{display:flex}
+    .modal{width:100%;max-width:560px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;box-shadow:0 30px 100px rgba(0,0,0,.6);overflow:hidden}
+    .m-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+    .m-title{font-weight:800}
+    .m-body{padding:16px;line-height:1.55;color:color-mix(in oklab, var(--text), white 8%)}
+    .m-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+    .x{all:unset;cursor:pointer;color:var(--muted);padding:8px;border-radius:10px}
+    .x:hover{background:color-mix(in oklab, var(--panel), #000 10%)}
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 640px){
+      .page{margin:12px auto;padding:0 10px}
+      .title{font-size:16px}
+      .toolbar{gap:6px}
+      .btn{padding:8px 10px;font-size:14px}
+      .orderHead{flex-direction:column;align-items:flex-start}
+      .row{flex-wrap:wrap}
+      .acc-body{padding-left:14px}
+      .tabs{padding:8px}
+      .chip{font-size:11px;padding:5px 8px}
+    }
+  </style>
+</head>
+<body class="theme-emerald">
+  <div class="page">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <span class="logo" aria-hidden="true">
+            <!-- Icon uses CSS variables via style on stops -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <defs>
+                <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" style="stop-color: var(--accent)"/>
+                  <stop offset="100%" style="stop-color: var(--admin)"/>
+                </linearGradient>
+              </defs>
+              <rect x="4" y="6" width="10" height="6" rx="2"></rect>
+              <rect x="10" y="12" width="10" height="6" rx="2"></rect>
+            </svg>
+          </span>
+          <div>
+            <div class="title">BatchPay</div>
+            <div class="merchant">Integreret i: Tony's Pizza · Demo</div>
+          </div>
+        </div>
+        <div class="rightHead">
+          <span class="swLabel">Tema:</span>
+          <span class="sw emerald" title="Emerald" data-theme="emerald"></span>
+          <span class="sw sapphire" title="Sapphire" data-theme="sapphire"></span>
+          <span class="sw violet" title="Violet" data-theme="violet"></span>
+          <span class="sw sunset" title="Sunset" data-theme="sunset"></span>
+        </div>
+      </div>
+
+      <div class="topctl">
+        <div class="row" style="gap:10px">
+          <div id="boostToggle" class="toggle on" role="switch" aria-checked="true" title="Fremhæv administrator"></div>
+          <div>Fremhæv administrator</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="people">Oversigt pr. person</button>
+        <button class="tab" data-tab="items">Oversigt pr. vare</button>
+      </div>
+
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+
+  <!-- Modal root -->
+  <div id="modalOverlay" class="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+      <div class="m-head">
+        <div id="m-title" class="m-title">Titel</div>
+        <button class="x" aria-label="Luk modal" onclick="closeModal()">✕</button>
+      </div>
+      <div id="m-body" class="m-body">Body</div>
+      <div class="m-foot">
+        <button class="btn" onclick="closeModal()">Luk</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Restore theme from localStorage
+    const savedTheme = localStorage.getItem('batchpay_theme');
+    if(savedTheme){ document.body.className = 'theme-'+savedTheme; }
+
+    // Theme switcher
+    document.querySelectorAll('.sw').forEach(sw=>{
+      sw.addEventListener('click', ()=>{
+        const t = sw.getAttribute('data-theme');
+        document.body.className = 'theme-'+t;
+        localStorage.setItem('batchpay_theme', t);
+      });
+    });
+
+    // ------- Data -------
+    const currentUserUid = 'jonas';
+    const orders = [
+      {
+        id:'A12',
+        title:"Tony's Pizza · Fredagshygge",
+        adminUid:'maja',
+        lines:[
+          { key:'marg', name:'Margherita', price:85 },
+          { key:'pep',  name:'Pepperoni', price:200 },
+          { key:'cola', name:'Cola 0,5L', price:135 },
+        ],
+        people:[
+          {uid:'maja',  initials:'MJ', name:'Maja', state:'paid',    lines:{pep:{base:100,enabled:true}, cola:{base:25,enabled:true}} },
+          {uid:'jonas', initials:'JO', name:'Jonas (dig)',     state:'pending', lines:{marg:{base:85, enabled:true}, cola:{base:45,enabled:true}} },
+          {uid:'liva',  initials:'LI', name:'Liva',            state:'paid',    lines:{pep:{base:100,enabled:true}, cola:{base:45,enabled:true}} },
+          {uid:'noah',  initials:'NO', name:'Noah',            state:'pending', lines:{cola:{base:20,enabled:true}} },
+        ]
+      },
+      {
+        id:'D88',
+        title:"Tony's Pizza · Team aften",
+        adminUid:'noah',
+        lines:[
+          { key:'marg', name:'Margherita', price:85 },
+          { key:'pep',  name:'Pepperoni', price:100 },
+          { key:'cola', name:'Cola 0,5L', price:100 },
+        ],
+        people:[
+          {uid:'noah',  initials:'NO', name:'Noah', state:'pending', lines:{pep:{base:100,enabled:true}} },
+          {uid:'jonas', initials:'JO', name:'Jonas (dig)',     state:'pending', lines:{marg:{base:85,enabled:true}, cola:{base:50,enabled:true}} },
+          {uid:'maja',  initials:'MJ', name:'Maja',            state:'paid',    lines:{cola:{base:50,enabled:true}} },
+        ]
+      },
+      {
+        id:'E77',
+        title:"Takeaway · Fodboldaften",
+        adminUid:'jonas',
+        lines:[
+          { key:'burger', name:'Burger menu', price:360 },
+          { key:'cola',   name:'Cola 0,5L',   price:60  },
+        ],
+        people:[
+          {uid:'jonas',  initials:'JO', name:'Jonas', state:'pending', lines:{burger:{base:120,enabled:true}, cola:{base:20,enabled:true}} },
+          {uid:'mikkel', initials:'MI', name:'Mikkel',           state:'pending', lines:{burger:{base:120,enabled:true}, cola:{base:20,enabled:true}} },
+          {uid:'sara',   initials:'SA', name:'Sara',             state:'paid',    lines:{burger:{base:120,enabled:true}, cola:{base:20,enabled:true}} },
+        ],
+        locked:false,
+        deadlineSecs: 20*60
+      }
+    ];
+
+    // ------- UI STATE (persist open/close across tabs) -------
+    const uiState = {
+      orderOpen: {},         // { [orderId]: bool }
+      personOpen: {}         // { [orderId]: { [uid]: bool } }
+    };
+
+    // ------- Helpers -------
+    function personSum(p){ return Object.values(p.lines).reduce((a,x)=>a+(x.enabled?x.base:0),0); }
+    function orderTotal(o){ return o.lines.reduce((a,l)=>a+l.price,0); }
+    function paidCount(o){ return o.people.filter(p=>p.state==='paid').length; }
+    function statusOf(o){
+      if(o.cancelled) return 'Annulleret';
+      const pc = paidCount(o);
+      if(pc===0) return 'Afventer';
+      if(pc===o.people.length) return 'Fuldført';
+      return 'I gang';
+    }
+    function isAdmin(o){ return o.adminUid===currentUserUid; }
+    function adminDisplayName(o){
+      const person = o.people.find(p=>p.uid===o.adminUid);
+      return person ? person.name.replace(' (dig)','') : '—';
+    }
+    function findCurrentUserIndex(o){ return o.people.findIndex(p=>p.uid===currentUserUid); }
+    function ensurePersonState(orderId){ if(!uiState.personOpen[orderId]) uiState.personOpen[orderId]={}; }
+
+    // ------- Modal logic -------
+    const modalContent = {
+      copyLink: {
+        title: 'Kopiér link',
+        body: (o)=>`I den færdige løsning kan du kopiere et unik deltagerlink til <b>${o.title}</b>. 
+        Linket åbner BatchPay direkte på ordren – perfekt til SMS, Messenger og e-mail.`
+      },
+      leaveOrder: {
+        title: 'Forlad ordre',
+        body: (o)=>`Du vil kunne forlade <b>${o.title}</b>. Hvis du allerede har betalt, bliver din autorisation frigivet eller refunderet efter reglerne.`
+      },
+      payShare: {
+        title: 'Betal din andel',
+        body: (o)=>`Her betaler du din andel for <b>${o.title}</b>. I produktion sker en autorisation på din del, 
+        og den samlede betaling gennemføres først, når alle deltagere har betalt.`
+      },
+      invite: {
+        title: 'Invitér deltagere',
+        body: (o)=>`Send invitationer til nye deltagere via e-mail, link eller QR. Deltagere, der ikke har en konto, får en guidet oprettelse.`
+      },
+      lockCart: {
+        title: 'Lås/åbn kurv',
+        body: (o)=>`Som administrator kan du midlertidigt låse kurven for <b>${o.title}</b>, så ingen kan ændre deres linjer, mens du afstemmer.`
+      },
+      remind: {
+        title: 'Send påmindelse',
+        body: (o)=>`BatchPay sender venlige påmindelser til deltagere, der endnu ikke har betalt. Kan tidsstyres og gentages.`
+      },
+      deadline: {
+        title: 'Sæt frist',
+        body: (o)=>`Sæt en deadline for <b>${o.title}</b>. Efter fristen kan ordren auto-annulleres eller delvist forankres efter dine regler.`
+      },
+      cancel: {
+        title: 'Annullér ordre',
+        body: (o)=>`Annullér hele ordren. Alle autorisationer frigives. Denne handling kræver bekræftelse og kan logges til audit.`
+      }
+    };
+
+    function openModal(key, order){
+      const m = modalContent[key];
+      if(!m) return;
+      document.getElementById('m-title').innerHTML = m.title;
+      document.getElementById('m-body').innerHTML = typeof m.body==='function' ? m.body(order) : m.body;
+      const ov = document.getElementById('modalOverlay');
+      ov.classList.add('open'); ov.setAttribute('aria-hidden','false');
+    }
+    function closeModal(){
+      const ov = document.getElementById('modalOverlay');
+      ov.classList.remove('open'); ov.setAttribute('aria-hidden','true');
+    }
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+    document.getElementById('modalOverlay').addEventListener('click', (e)=>{
+      if(e.target.id==='modalOverlay') closeModal();
+    });
+
+    // ------- Toolbar renderer -------
+    function renderToolbarHTML(o, oi){
+      const admin = isAdmin(o);
+      const myIdx = findCurrentUserIndex(o);
+      const mySum = myIdx>=0 ? personSum(o.people[myIdx]) : 0;
+      if(!admin){
+        return `<div class="toolbar">
+          <button class="btn openModal" data-action="copyLink" data-oi="${oi}">Kopiér link</button>
+          <button class="btn openModal" data-action="leaveOrder" data-oi="${oi}">Forlad ordre</button>
+          <button id="payBtn_${oi}" class="btn primary openModal" data-action="payShare" data-oi="${oi}">Betal din andel (DKK ${mySum})</button>
+        </div>`;
+      }
+      return `<div class="toolbar admin">
+        <button class="btn openModal" data-action="copyLink" data-oi="${oi}">Kopiér link</button>
+        <button class="btn openModal" data-action="invite" data-oi="${oi}">Invitér deltagere</button>
+        <button class="btn openModal" data-action="lockCart" data-oi="${oi}">${o.locked?'Åbn kurv':'Lås kurv'}</button>
+        <button class="btn openModal" data-action="remind" data-oi="${oi}">Send påmindelse</button>
+        <button class="btn openModal" data-action="deadline" data-oi="${oi}">Sæt frist</button>
+        <button class="btn ghost openModal" data-action="cancel" data-oi="${oi}">Annullér ordre</button>
+        <button id="payBtn_${oi}" class="btn primary openModal" data-action="payShare" data-oi="${oi}">Betal din andel (DKK ${mySum})</button>
+      </div>`;
+    }
+
+    // ------- Render People View -------
+    function renderPeopleView(){
+      const wrap=document.getElementById('content');
+      wrap.innerHTML='';
+      orders.forEach((o,oi)=>{
+        const card=document.createElement('div');
+        card.className='orderCard'+(isAdmin(o)?' adminOwner':'');
+        const total = orderTotal(o);
+        const pc = paidCount(o);
+        const status = statusOf(o);
+        const pillCls = status==='Fuldført'?'ok':(status==='I gang'?'warn':'bad');
+        const headId='orderHead_'+oi, bodyId='orderBody_'+oi;
+
+        const adminBadge = isAdmin(o) ? '<span class="adminBadge">🛡️ Du er administrator på denne ordre</span>' : '';
+        const adminLabel = `<span class="muted">· Administrator: ${adminDisplayName(o)}</span>`;
+
+        card.innerHTML = `
+          <div id="${headId}" class="orderHead" role="button" aria-expanded="false" aria-controls="${bodyId}">
+            <div class="orderTitle">
+              <span class="chev">▶</span>
+              <strong>${o.title}</strong>
+              ${adminBadge}
+              ${adminLabel}
+              ${o.locked ? '<span class="pill">🔒 Kurv låst</span>' : ''}
+              ${o.deadlineSecs ? '<span class="pill">⏳ <span id="dl_'+oi+'"></span></span>' : ''}
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="pill">Total DKK ${total}</span>
+              <span class="pill"><strong>${pc}/${o.people.length} betalt</strong></span>
+              <span class="pill ${pillCls}">${status}</span>
+            </div>
+          </div>
+          <div id="${bodyId}" class="orderBody" aria-hidden="true">
+            ${renderToolbarHTML(o, oi)}
+            <div class="acc" id="acc_${oi}"></div>
+          </div>`;
+        const isOpen = !!uiState.orderOpen[o.id];
+        if(isOpen){
+          card.classList.add('open');
+          setTimeout(()=>{
+            card.querySelector('#'+headId)?.setAttribute('aria-expanded','true');
+            card.querySelector('#'+bodyId)?.setAttribute('aria-hidden','false');
+          },0);
+        }
+        card.querySelector('#'+headId).addEventListener('click',()=>toggleOrder(card, o.id));
+        renderPeopleAccordion(oi, card, o);
+        wrap.appendChild(card);
+        if(o.deadlineSecs){ startDeadlineTimer(o, oi); }
+      });
+      wireModals();
+    }
+
+    function renderPeopleAccordion(orderIndex, card, o){
+      const acc=card.querySelector('#acc_'+orderIndex);
+      acc.innerHTML='';
+      ensurePersonState(o.id);
+      o.people.forEach((p,pi)=>{
+        const item=document.createElement('div');
+        item.className='acc-item';
+        const paid = p.state==='paid';
+        const sum = personSum(p);
+        const headId='phead_'+orderIndex+'_'+pi, bodyId='pbody_'+orderIndex+'_'+pi;
+        let bodyHtml='';
+        Object.entries(p.lines).forEach(([key,meta])=>{
+          const line=o.lines.find(x=>x.key===key);
+          const on=meta.enabled;
+          const canToggle = !o.locked && (p.uid===currentUserUid || isAdmin(o));
+          bodyHtml += `
+            <div class="line-row">
+              <div class="line-name">
+                <strong>${line.name}</strong>
+                <span class="muted">${canToggle?'Din andel':'Låst'}</span>
+              </div>
+              <div class="row" style="gap:12px">
+                <div class="line-amount">DKK ${meta.base}</div>
+                <div class="switch ${on?'on':''}" role="switch" aria-checked="${on?'true':'false'}" ${canToggle?'':'aria-disabled="true"'}
+                  onclick="${canToggle?('toggleLine('+orderIndex+','+pi+',\''+key+'\', this)'):'void(0)'}"></div>
+              </div>
+            </div>`;
+        });
+
+        item.innerHTML=`
+          <div id="${headId}" class="acc-head" role="button" aria-expanded="false" aria-controls="${bodyId}">
+            <div class="acc-left">
+              <div class="avatar">${p.initials}</div>
+              <div>
+                <div class="name">${p.name}</div>
+                <div class="muted status ${paid?'ok':'wait'}">${paid?'✅ Betalt':'⏳ Afventer'}</div>
+              </div>
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="muted">Sum</span>
+              <strong class="sum" id="sum_${orderIndex}_${pi}">DKK ${sum}</strong>
+              <span class="chev">▶</span>
+            </div>
+          </div>
+          <div id="${bodyId}" class="acc-body" aria-hidden="true">
+            ${bodyHtml || '<div class="muted" style="margin-top:8px">Ingen tilknyttede linjer</div>'}
+          </div>`;
+
+        if(uiState.personOpen[o.id][p.uid]){
+          item.classList.add('open');
+          setTimeout(()=>{
+            item.querySelector('#'+headId)?.setAttribute('aria-expanded','true');
+            item.querySelector('#'+bodyId)?.setAttribute('aria-hidden','false');
+          },0);
+        }
+        item.querySelector('#'+headId).addEventListener('click',()=>togglePerson(item, o.id, p.uid));
+        acc.appendChild(item);
+      });
+    }
+
+    // ------- Render Items View -------
+    function renderItemsView(){
+      const wrap=document.getElementById('content');
+      wrap.innerHTML='';
+      orders.forEach((o,oi)=>{
+        const card=document.createElement('div');
+        card.className='orderCard'+(isAdmin(o)?' adminOwner':'');
+        const total = orderTotal(o);
+        const pc = paidCount(o);
+        const status = statusOf(o);
+        const pillCls = status==='Fuldført'?'ok':(status==='I gang'?'warn':'bad');
+        const headId='orderHeadItems_'+oi, bodyId='orderBodyItems_'+oi;
+
+        const adminBadge = isAdmin(o) ? '<span class="adminBadge">🛡️ Du er administrator på denne ordre</span>' : '';
+        const adminLabel = `<span class="muted">· Administrator: ${adminDisplayName(o)}</span>`;
+
+        card.innerHTML = `
+          <div id="${headId}" class="orderHead" role="button" aria-expanded="false" aria-controls="${bodyId}">
+            <div class="orderTitle">
+              <span class="chev">▶</span>
+              <strong>${o.title}</strong>
+              ${adminBadge}
+              ${adminLabel}
+              ${o.locked ? '<span class="pill">🔒 Kurv låst</span>' : ''}
+              ${o.deadlineSecs ? '<span class="pill">⏳ <span id="dl_items_'+oi+'"></span></span>' : ''}
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="pill">Total DKK ${total}</span>
+              <span class="pill"><strong>${pc}/${o.people.length} betalt</strong></span>
+              <span class="pill ${pillCls}">${status}</span>
+            </div>
+          </div>
+          <div id="${bodyId}" class="orderBody" aria-hidden="true">
+            ${renderToolbarHTML(o, oi)}
+            <div class="itemList" id="itemList_${oi}"></div>
+          </div>`;
+        const isOpen = !!uiState.orderOpen[o.id];
+        if(isOpen){
+          card.classList.add('open');
+          setTimeout(()=>{
+            card.querySelector('#'+headId)?.setAttribute('aria-expanded','true');
+            card.querySelector('#'+bodyId)?.setAttribute('aria-hidden','false');
+          },0);
+        }
+        card.querySelector('#'+headId).addEventListener('click',()=>toggleOrder(card, o.id));
+        renderItemsList(oi, card, o);
+        wrap.appendChild(card);
+        if(o.deadlineSecs){ startDeadlineTimer(o, oi, true); }
+      });
+      wireModals();
+    }
+
+    function renderItemsList(orderIndex, card, o){
+      const list=card.querySelector('#itemList_'+orderIndex);
+      list.innerHTML='';
+      o.lines.forEach(line=>{
+        const chips=[];
+        o.people.forEach(p=>{
+          const item=p.lines[line.key];
+          if(item && item.enabled && item.base>0){
+            chips.push(`<span class="chip">${p.name.split(' ')[0]} · DKK ${item.base}</span>`);
+          }
+        });
+        const div=document.createElement('div');
+        div.className='itemCard';
+        div.innerHTML = `
+          <div class="row" style="margin-bottom:6px">
+            <div>
+              <strong>${line.name}</strong>
+              <div class="muted">Linjetotal: DKK ${line.price}</div>
+            </div>
+            <div class="muted">${chips.length} deltagere</div>
+          </div>
+          <div class="chips">${chips.join('') || '<span class="muted">Ingen bestillinger på denne linje</span>'}</div>`;
+        list.appendChild(div);
+      });
+    }
+
+    // ------- Toggles & admin actions -------
+    function toggleOrder(card, orderId){
+      const open = card.classList.toggle('open');
+      const head = card.querySelector('.orderHead');
+      const body = card.querySelector('.orderBody');
+      head.setAttribute('aria-expanded', open?'true':'false');
+      body.setAttribute('aria-hidden', open?'false':'true');
+      uiState.orderOpen[orderId] = open;
+    }
+    function togglePerson(item, orderId, uid){
+      const open = item.classList.toggle('open');
+      const head = item.querySelector('.acc-head');
+      const body = item.querySelector('.acc-body');
+      head.setAttribute('aria-expanded', open?'true':'false');
+      body.setAttribute('aria-hidden', open?'false':'true');
+      ensurePersonState(orderId);
+      uiState.personOpen[orderId][uid] = open;
+    }
+    function toggleLine(orderIdx, personIdx, lineKey, el){
+      const o = orders[orderIdx];
+      const p = o.people[personIdx];
+      if(o.locked) return;
+      const meta = p.lines[lineKey];
+      meta.enabled = !meta.enabled;
+      if(meta.enabled){ el.classList.add('on'); el.setAttribute('aria-checked','true'); }
+      else{ el.classList.remove('on'); el.setAttribute('aria-checked','false'); }
+      const sumEl = document.getElementById('sum_'+orderIdx+'_'+personIdx);
+      if(sumEl) sumEl.textContent = 'DKK '+personSum(p);
+      const myIdx = findCurrentUserIndex(o);
+      const btn = document.getElementById('payBtn_'+orderIdx);
+      if(btn && myIdx>=0) btn.textContent = 'Betal din andel (DKK '+personSum(o.people[myIdx])+')';
+      if(currentTab==='items') renderItemsView();
+    }
+
+    function wireModals(){
+      document.querySelectorAll('.openModal').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const oi = parseInt(btn.getAttribute('data-oi'), 10);
+          const action = btn.getAttribute('data-action');
+          openModal(action, orders[oi]);
+        });
+      });
+    }
+
+    // Admin highlight toggle: adds/removes .adminBoost on <body>
+    const boost = document.getElementById('boostToggle');
+    function applyBoost(){ document.body.classList.toggle('adminBoost', boost.classList.contains('on')); }
+    boost.addEventListener('click', ()=>{ boost.classList.toggle('on'); boost.setAttribute('aria-checked', boost.classList.contains('on')?'true':'false'); applyBoost(); });
+
+    // Deadline timers
+    const timers = {};
+    function startDeadlineTimer(o, oi, inItems){
+      const id = (inItems?'dl_items_':'dl_')+oi;
+      clearInterval(timers[id]);
+      function fmt(s){ if(s<=0) return '00:00'; const m = String(Math.floor(s/60)).padStart(2,'0'); const ss = String(s%60).padStart(2,'0'); return m+':'+ss; }
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.textContent = fmt(o.deadlineSecs);
+      timers[id] = setInterval(()=>{
+        if(o.deadlineSecs>0){ o.deadlineSecs--; el.textContent = fmt(o.deadlineSecs); }
+        else { clearInterval(timers[id]); el.textContent='Udløbet'; }
+      }, 1000);
+    }
+
+    // ------- Tabs -------
+    let currentTab='people';
+    function setTab(t){
+      currentTab=t;
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelector('.tab[data-tab="'+t+'"]').classList.add('active');
+      if(t==='people') renderPeopleView(); else renderItemsView();
+    }
+    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=> setTab(b.dataset.tab)));
+
+    // init
+    applyBoost();
+    setTab('people');
+  </script>
+</body>
+</html>
