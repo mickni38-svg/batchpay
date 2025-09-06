@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Betalsammen – Scroll fix</title>
+  <style>
+    :root{--bg:#0f172a;--muted:#94a3b8;--text:#e2e8f0;--accent:#60a5fa;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--line:#1f2a44;--card:#0b132a;--owner:#3152a3}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0a0f1f;color:#e2e8f0}
+    .overlay{position:fixed;inset:0;background:rgba(2,6,23,.6);display:flex;align-items:center;justify-content:center;padding:24px}
+    .modal{
+      width:100%;max-width:1150px;
+      background:linear-gradient(180deg,#0f172a,#0b1224);
+      border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 80px rgba(0,0,0,.6);
+      overflow:hidden;display:flex;flex-direction:column;
+      height:92vh; max-height:92vh; min-height:0; /* <-- key */
+    }
+    .header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #1e293b;flex:0 0 auto}
+    .title{font-weight:700}.merchant{font-size:12px;color:#94a3b8}
+    .close{all:unset;color:#94a3b8;cursor:pointer;padding:8px;border-radius:10px}
+    .close:hover{background:#111a2e}
+    .topctl{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid #1e293b;background:#0b1224;flex:0 0 auto}
+    .toggle{position:relative;width:46px;height:26px;border-radius:999px;background:#1b2744;border:1px solid #2a3a62;cursor:pointer;flex-shrink:0}
+    .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#93c5fd;transition:all .2s ease}
+    .toggle.on{background:#14532d;border-color:#1a6a3a}
+    .toggle.on::after{left:25px;background:#86efac}
+    .label{font-size:13px;color:#cbd5e1}
+    .tabs{display:flex;gap:8px;background:#0b1224;border-bottom:1px solid #1e293b;padding:10px 12px;flex:0 0 auto}
+    .tab{padding:10px 14px;border-radius:12px;border:1px solid #1f2a44;background:#0d1530;color:#cbd5e1;cursor:pointer}
+    .tab.active{background:#0f1d4a;border-color:#3152a3;color:#fff}
+    .content{
+      padding:16px;display:grid;gap:12px;flex:1 1 auto;min-height:0; /* <-- key */
+      overflow-y:auto;overflow-x:hidden;
+      -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      scrollbar-color:#1e2b4b #0b1224; /* Firefox */
+    }
+    .content::-webkit-scrollbar{width:10px}
+    .content::-webkit-scrollbar-thumb{background:#1e2b4b;border-radius:8px;border:2px solid #0b1224}
+    .content::-webkit-scrollbar-thumb:hover{background:#28385f}
+    /* Pills, buttons */
+    .pill{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #223055;color:#bcd0ff;background:#0b132a}
+    .pill.ok{border-color:#134e22;color:#a7f3d0;background:#0b1f14}
+    .pill.warn{border-color:#573b0a;color:#fde68a;background:#251a07}
+    .pill.bad{border-color:#6b1111;color:#fecaca;background:#2a0b0b}
+    .muted{color:#94a3b8;font-size:12px}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid #2b3b63;background:#0e1630;color:#e2e8f0;cursor:pointer}
+    .btn.primary{border-color:#1d4ed8;background:linear-gradient(180deg,#2563eb,#1d4ed8);color:#fff}
+    .btn.ghost{background:#0b1224;border-color:#1e293b}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid var(--line);border-radius:12px;background:#0b1224;margin-bottom:10px}
+    .toolbar.owner{background:#0f1d4a;border-color:var(--owner);box-shadow:0 0 0 1px rgba(49,82,163,.25) inset}
+    .orderCard{position:relative;border:1px solid var(--line);background:var(--card);border-radius:18px;overflow:hidden;margin:10px 0;}
+    .orderCard::before{content:""; position:absolute; inset:-6px; border-radius:22px; border:2px solid #1e2b4b; opacity:.6; pointer-events:none;}
+    .orderCard.owner{background:
+      radial-gradient(900px 240px at 0% 0%, rgba(59,130,246,.14), transparent 65%),
+      var(--card);
+      border-color:var(--owner);
+      box-shadow:0 0 0 2px rgba(59,130,246,.15) inset;
+    }
+    .orderCard.owner::before{ border-color:var(--owner); }
+    .orderCard.owner::after{
+      content:""; position:absolute; left:0; top:0; bottom:0; width:6px; 
+      background:linear-gradient(180deg,#60a5fa,#2563eb);
+      box-shadow:0 0 18px rgba(59,130,246,.45);
+      pointer-events:none;
+    }
+    .orderHead{position:relative;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;background:#0e162e}
+    .orderTitle{display:flex;align-items:center;gap:10px}
+    .chev{transition:transform .2s ease}
+    .orderCard.open .chev{transform:rotate(90deg)}
+    .orderBody{display:none;padding:12px 14px;border-top:1px dashed var(--line)}
+    .orderCard.open .orderBody{display:block}
+    .opBadge{font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;padding:4px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;color:#fde68a;background:linear-gradient(180deg,#3b2b00,#1f1600);border:1px solid #8b6b00;box-shadow:0 2px 10px rgba(0,0,0,.25),0 0 0 1px rgba(139,107,0,.25) inset}
+    .acc{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .acc-item{border:1px solid var(--line);background:#0e162e;border-radius:14px;overflow:hidden}
+    .acc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;cursor:pointer}
+    .acc-left{display:flex;align-items:center;gap:12px}
+    .avatar{width:28px;height:28px;border-radius:999px;background:#0f1d4a;border:1px solid #3152a3;display:flex;align-items:center;justify-content:center;font-size:12px;color:#dbeafe}
+    .status{font-size:12px}
+    .sum{font-variant-numeric:tabular-nums}
+    .acc-body{padding:0 14px 12px 54px;background:#0c1228;border-top:1px dashed var(--line);display:none}
+    .acc-item.open .acc-body{display:block}
+    .line-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:#0e1630;padding:8px 10px;border-radius:10px;margin-top:8px}
+    .switch{position:relative;width:44px;height:24px;background:#16213a;border:1px solid #26395f;border-radius:999px;cursor:pointer;flex-shrink:0}
+    .switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:#93c5fd;border-radius:50%;transition:all .2s ease}
+    .switch.on{background:#14532d;border-color:#166534}.switch.on::after{left:22px;background:#86efac}
+    .itemList{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .itemCard{border:1px solid var(--line);background:#0e162e;border-radius:12px;padding:10px 12px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#0f1d4a;border:1px solid #3152a3;color:#dbeafe;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="modal" role="dialog" aria-labelledby="gp-title" aria-modal="true">
+      <div class="header">
+        <div>
+          <div id="gp-title" class="title">Betalsammen</div>
+          <div class="merchant">Integreret i: Tony's Pizza · Demo-popup</div>
+        </div>
+        <button class="close" aria-label="Luk" onclick="alert('Luk modal – demo')">✕</button>
+      </div>
+
+      <div class="topctl">
+        <div class="row" style="gap:10px">
+          <div id="boostToggle" class="toggle on" role="switch" aria-checked="true"></div>
+          <div class="label">Fremhæv opretter</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="people">Ordrer (Personer)</button>
+        <button class="tab" data-tab="items">Ordrer (Varer)</button>
+      </div>
+
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+
+  <script>
+    const currentUserUid = 'jonas';
+    const orders = [
+      { id:'A12', title:"Tony's Pizza · Fredagshygge", ownerUid:'maja',
+        lines:[{key:'marg',name:'Margherita',price:85},{key:'pep',name:'Pepperoni',price:200},{key:'cola',name:'Cola 0,5L',price:135}],
+        people:[
+          {uid:'maja',initials:'MJ',name:'Maja (opretter)',state:'paid',lines:{pep:{base:100,enabled:true},cola:{base:25,enabled:true}}},
+          {uid:'jonas',initials:'JO',name:'Jonas (dig)',state:'pending',lines:{marg:{base:85,enabled:true},cola:{base:45,enabled:true}}},
+          {uid:'liva',initials:'LI',name:'Liva',state:'paid',lines:{pep:{base:100,enabled:true},cola:{base:45,enabled:true}}},
+          {uid:'noah',initials:'NO',name:'Noah',state:'pending',lines:{cola:{base:20,enabled:true}}},
+        ]},
+      { id:'D88', title:"Tony's Pizza · Team aften", ownerUid:'noah',
+        lines:[{key:'marg',name:'Margherita',price:85},{key:'pep',name:'Pepperoni',price:100},{key:'cola',name:'Cola 0,5L',price:100}],
+        people:[
+          {uid:'noah',initials:'NO',name:'Noah (opretter)',state:'pending',lines:{pep:{base:100,enabled:true}}},
+          {uid:'jonas',initials:'JO',name:'Jonas (dig)',state:'pending',lines:{marg:{base:85,enabled:true},cola:{base:50,enabled:true}}},
+          {uid:'maja',initials:'MJ',name:'Maja',state:'paid',lines:{cola:{base:50,enabled:true}}},
+        ]},
+      { id:'E77', title:"Takeaway · Fodboldaften", ownerUid:'jonas',
+        lines:[{key:'burger',name:'Burger menu',price:360},{key:'cola',name:'Cola 0,5L',price:60}],
+        people:[
+          {uid:'jonas',initials:'JO',name:'Jonas (opretter)',state:'pending',lines:{burger:{base:120,enabled:true},cola:{base:20,enabled:true}}},
+          {uid:'mikkel',initials:'MI',name:'Mikkel',state:'pending',lines:{burger:{base:120,enabled:true},cola:{base:20,enabled:true}}},
+          {uid:'sara',initials:'SA',name:'Sara',state:'paid',lines:{burger:{base:120,enabled:true},cola:{base:20,enabled:true}}},
+        ],locked:false,deadlineSecs:20*60},
+    ];
+
+    const timers = {};
+    function personSum(p){ return Object.values(p.lines).reduce((a,x)=>a+(x.enabled?x.base:0),0); }
+    function orderTotal(o){ return o.lines.reduce((a,l)=>a+l.price,0); }
+    function paidCount(o){ return o.people.filter(p=>p.state==='paid').length; }
+    function statusOf(o){ if(o.cancelled) return 'Annulleret'; const pc=paidCount(o); if(pc===0) return 'Afventer'; if(pc===o.people.length) return 'Fuldført'; return 'I gang'; }
+    function findCurrentUserIndex(o){ return o.people.findIndex(p=>p.uid===currentUserUid); }
+    function isOwner(o){ return o.ownerUid===currentUserUid; }
+    function displayOwner(o){ const person=o.people.find(p=>p.uid===o.ownerUid); return person?person.name.replace(' (dig)',''):'—'; }
+
+    function renderToolbarHTML(o,oi){
+      const owner=isOwner(o), myIdx=findCurrentUserIndex(o), mySum=myIdx>=0?personSum(o.people[myIdx]):0;
+      if(!owner){return `<div class="toolbar"><button class="btn">Kopiér link</button><button class="btn">Forlad ordre</button><button id="payBtn_${oi}" class="btn primary">Betal din andel (DKK ${mySum})</button></div>`;}
+      return `<div class="toolbar owner"><button class="btn">Kopiér link</button><button class="btn">Invitér deltagere</button><button class="btn" onclick="toggleLock(${oi})">${o.locked?'Åbn kurv':'Lås kurv'}</button><button class="btn" onclick="sendReminders(${oi})">Send påmindelse</button><button class="btn" onclick="setDeadline(${oi})">Sæt frist</button><button class="btn ghost" onclick="cancelOrder(${oi})">Annullér ordre</button><button id="payBtn_${oi}" class="btn primary">Betal din andel (DKK ${mySum})</button></div>`;
+    }
+
+    function renderPeopleView(){
+      const wrap=document.getElementById('content'); wrap.innerHTML='';
+      orders.forEach((o,oi)=>{
+        const card=document.createElement('div'); card.className='orderCard'+(isOwner(o)?' owner':'');
+        const total=orderTotal(o), pc=paidCount(o), status=statusOf(o);
+        const headId='orderHead_'+oi, bodyId='orderBody_'+oi;
+        card.innerHTML = `
+          <div id="${headId}" class="orderHead" role="button" aria-expanded="false" aria-controls="${bodyId}">
+            <div class="orderTitle">
+              <span class="chev">▶</span>
+              <strong>${o.title}</strong>
+              ${isOwner(o)?'<span class="opBadge">👑 Opretter-tilstand</span>':''}
+              <span class="muted">· Opretter: ${displayOwner(o)}</span>
+              ${o.locked?'<span class="pill">🔒 Kurv låst</span>':''}
+              ${o.deadlineSecs?'<span class="pill">⏳ <span id="dl_'+oi+'"></span></span>':''}
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="pill">Total DKK ${total}</span>
+              <span class="pill"><strong>${pc}/${o.people.length} betalt</strong></span>
+              <span class="pill ${status==='Fuldført'?'ok':(status==='I gang'?'warn':'bad')}">${status}</span>
+            </div>
+          </div>
+          <div id="${bodyId}" class="orderBody" aria-hidden="true">
+            ${renderToolbarHTML(o, oi)}
+            <div class="acc" id="acc_${oi}"></div>
+          </div>`;
+        card.querySelector('#'+headId).addEventListener('click',()=>toggleOrder(card));
+        renderPeopleAccordion(oi, card, o);
+        wrap.appendChild(card);
+        if(o.deadlineSecs){ startDeadlineTimer(o, oi); }
+      });
+    }
+
+    function renderPeopleAccordion(orderIndex, card, o){
+      const acc=card.querySelector('#acc_'+orderIndex); acc.innerHTML='';
+      o.people.forEach((p,pi)=>{
+        const item=document.createElement('div'); item.className='acc-item';
+        const sum=personSum(p), headId='phead_'+orderIndex+'_'+pi, bodyId='pbody_'+orderIndex+'_'+pi;
+        let bodyHtml='';
+        Object.entries(p.lines).forEach(([key,meta])=>{
+          const line=o.lines.find(x=>x.key===key); const on=meta.enabled;
+          const canToggle=!o.locked && (p.uid===currentUserUid || isOwner(o));
+          bodyHtml += `<div class="line-row">
+              <div class="line-name"><strong>${line.name}</strong><span class="muted">${canToggle?'Din andel':'Låst'}</span></div>
+              <div class="row" style="gap:12px">
+                <div class="line-amount">DKK ${meta.base}</div>
+                <div class="switch ${on?'on':''}" role="switch" aria-checked="${on?'true':'false'}" ${canToggle?'':'aria-disabled="true"'}
+                  onclick="${canToggle?('toggleLine('+orderIndex+','+pi+',\''+key+'\', this)'):'void(0)'}"></div>
+              </div>
+            </div>`;
+        });
+        item.innerHTML=`
+          <div id="${headId}" class="acc-head" role="button" aria-expanded="false" aria-controls="${bodyId}">
+            <div class="acc-left"><div class="avatar">${p.initials}</div>
+              <div><div class="name">${p.name}</div><div class="muted status">${p.state==='paid'?'✅ Betalt':'⏳ Afventer'}</div></div></div>
+            <div class="row" style="gap:8px"><span class="muted">Sum</span><strong class="sum" id="sum_${orderIndex}_${pi}">DKK ${sum}</strong><span class="chev">▶</span></div>
+          </div>
+          <div id="${bodyId}" class="acc-body" aria-hidden="true">${bodyHtml || '<div class="muted" style="margin-top:8px">Ingen tilknyttede linjer</div>'}</div>`;
+        item.querySelector('#'+headId).addEventListener('click',()=>togglePerson(item));
+        acc.appendChild(item);
+      });
+    }
+
+    function renderItemsView(){
+      const wrap=document.getElementById('content'); wrap.innerHTML='';
+      orders.forEach((o,oi)=>{
+        const card=document.createElement('div'); card.className='orderCard'+(isOwner(o)?' owner':'');
+        const total=orderTotal(o), pc=paidCount(o), status=statusOf(o);
+        const headId='orderHeadItems_'+oi, bodyId='orderBodyItems_'+oi;
+        card.innerHTML = `
+          <div id="${headId}" class="orderHead" role="button" aria-expanded="false" aria-controls="${bodyId}">
+            <div class="orderTitle">
+              <span class="chev">▶</span>
+              <strong>${o.title}</strong>
+              ${isOwner(o)?'<span class="opBadge">👑 Opretter-tilstand</span>':''}
+              <span class="muted">· Opretter: ${displayOwner(o)}</span>
+              ${o.locked?'<span class="pill">🔒 Kurv låst</span>':''}
+              ${o.deadlineSecs?'<span class="pill">⏳ <span id="dl_items_'+oi+'"></span></span>':''}
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="pill">Total DKK ${total}</span>
+              <span class="pill"><strong>${pc}/${o.people.length} betalt</strong></span>
+              <span class="pill ${status==='Fuldført'?'ok':(status==='I gang'?'warn':'bad')}">${status}</span>
+            </div>
+          </div>
+          <div id="${bodyId}" class="orderBody" aria-hidden="true">
+            ${renderToolbarHTML(o, oi)}
+            <div class="itemList" id="itemList_${oi}"></div>
+          </div>`;
+        card.querySelector('#'+headId).addEventListener('click',()=>toggleOrder(card));
+        renderItemsList(oi, card, o);
+        wrap.appendChild(card);
+        if(o.deadlineSecs){ startDeadlineTimer(o, oi, true); }
+      });
+    }
+
+    function renderItemsList(orderIndex, card, o){
+      const list=card.querySelector('#itemList_'+orderIndex); list.innerHTML='';
+      o.lines.forEach(line=>{
+        const chips=[]; o.people.forEach(p=>{ const item=p.lines[line.key]; if(item&&item.enabled&&item.base>0){ chips.push(`<span class="chip">${p.name.split(' ')[0]} · DKK ${item.base}</span>`);} });
+        const div=document.createElement('div'); div.className='itemCard';
+        div.innerHTML = `<div class="row" style="margin-bottom:6px"><div><strong>${line.name}</strong><div class="muted">Linjetotal: DKK ${line.price}</div></div><div class="muted">${chips.length} deltagere</div></div><div class="chips">${chips.join('') || '<span class="muted">Ingen bestillinger på denne linje</span>'}</div>`;
+        list.appendChild(div);
+      });
+    }
+
+    function toggleOrder(card){ const open=card.classList.toggle('open'); const head=card.querySelector('.orderHead'); const body=card.querySelector('.orderBody'); head.setAttribute('aria-expanded', open?'true':'false'); body.setAttribute('aria-hidden', open?'false':'true'); }
+    function togglePerson(item){ const open=item.classList.toggle('open'); const head=item.querySelector('.acc-head'); const body=item.querySelector('.acc-body'); head.setAttribute('aria-expanded', open?'true':'false'); body.setAttribute('aria-hidden', open?'false':'true'); }
+    function toggleLine(orderIdx, personIdx, lineKey, el){ const o=orders[orderIdx]; const p=o.people[personIdx]; if(o.locked) return; const meta=p.lines[lineKey]; meta.enabled=!meta.enabled; if(meta.enabled){el.classList.add('on');el.setAttribute('aria-checked','true');} else {el.classList.remove('on');el.setAttribute('aria-checked','false');} const sumEl=document.getElementById('sum_'+orderIdx+'_'+personIdx); if(sumEl) sumEl.textContent='DKK '+personSum(p); const myIdx=findCurrentUserIndex(o); const btn=document.getElementById('payBtn_'+orderIdx); if(btn&&myIdx>=0) btn.textContent='Betal din andel (DKK '+personSum(o.people[myIdx])+')'; if(currentTab==='items') renderItemsView(); }
+    function toggleLock(oi){ const o=orders[oi]; o.locked=!o.locked; if(currentTab==='people') renderPeopleView(); else renderItemsView(); }
+    function sendReminders(oi){ const o=orders[oi]; const pend=o.people.filter(p=>p.state!=='paid').map(p=>p.name).join(', '); alert('Påmindelser sendt til: '+(pend||'ingen')); }
+    function setDeadline(oi){ const o=orders[oi]; const mins=prompt('Sæt frist (minutter):','15'); if(mins && !isNaN(mins)){ o.deadlineSecs=parseInt(mins,10)*60; if(currentTab==='people') renderPeopleView(); else renderItemsView(); } }
+    function cancelOrder(oi){ const o=orders[oi]; if(confirm('Annullér ordren?')){ o.cancelled=true; if(currentTab==='people') renderPeopleView(); else renderItemsView(); } }
+    function startDeadlineTimer(o,oi,inItems){ const id=(inItems?'dl_items_':'dl_')+oi; clearInterval(timers[id]); function fmt(s){ if(s<=0) return '00:00'; const m=String(Math.floor(s/60)).padStart(2,'0'); const ss=String(s%60).padStart(2,'0'); return m+':'+ss;} const el=document.getElementById(id); if(!el) return; el.textContent=fmt(o.deadlineSecs); timers[id]=setInterval(()=>{ if(o.deadlineSecs>0){o.deadlineSecs--; el.textContent=fmt(o.deadlineSecs);} else {clearInterval(timers[id]); el.textContent='Udløbet';}},1000); }
+
+    let currentTab='people';
+    function setTab(t){ currentTab=t; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); document.querySelector('.tab[data-tab="'+t+'"]').classList.add('active'); if(t==='people') renderPeopleView(); else renderItemsView(); }
+    document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click', ()=> setTab(b.dataset.tab)));
+    document.getElementById('boostToggle').addEventListener('click',(e)=>{ e.currentTarget.classList.toggle('on'); e.currentTarget.setAttribute('aria-checked', e.currentTarget.classList.contains('on')?'true':'false'); });
+    setTab('people');
+  </script>
+</body>
+</html>
