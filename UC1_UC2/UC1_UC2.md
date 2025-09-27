@@ -36,4 +36,4 @@ App-bruger (A)
 ### Bemærkninger
 - **Notifikation til B** (modtageren) om, at der er kommet en ny venneanmodning, håndteres i en **separat use case**.  
 - Denne use case dækker kun søgning, valg af bruger og oprettelse af anmodning med status *Afventer*.  
-- UI/UX eksempel: [search-users.html](./search-users.html)
+- UI/UX eksempel:[search-users.html](https://mickni38-svg.github.io/batchpay/search-users.html)
