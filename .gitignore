@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/BatchPay/bin/Debug
+/BatchPay/obj
+/BatchPay/.vs/BatchPay
+/.vs/MINEPROJEKTER/v17/.wsuo
+/BatchPay.Api/bin/Debug/net8.0
+/BatchPay.Api/obj
+/Data/obj
+/Data/bin/Debug/net8.0
