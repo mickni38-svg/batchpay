@@ -1,42 +1,44 @@
-﻿using BatchPay.Data;
+﻿using BatchPayLogic;
+using Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder( args );
 
-// 🔹 Tilføj DbContext (Entity Framework Core)
-builder.Services.AddDbContext<BatchPayContext>( options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString( "DefaultConnection" ) ) );
+// EF
+builder.Services.AddDbContext<BatchPayContext>( opt =>
+    opt.UseSqlServer( builder.Configuration.GetConnectionString( "BatchPay" ),
+        b => b.MigrationsAssembly( "Data" ) )
+);
 
-// 🔹 Tilføj CORS policy
-builder.Services.AddCors( options =>
+builder.Services.AddScoped<IServiceLogic, ServiceLogic>();
+
+// Controllers + Swagger
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer(); // VIGTIG
+builder.Services.AddSwaggerGen( c =>
 {
-    options.AddPolicy( "AllowAll", policy =>
+    c.SwaggerDoc( "v1", new OpenApiInfo
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        Title = "BatchPay API",
+        Version = "v1",
+        Description = "API til globale brugere og venneliste"
     } );
 } );
 
-// 🔹 Controllers og Swagger
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
-// 🔹 Brug CORS
-app.UseCors( "AllowAll" );
-
-if (app.Environment.IsDevelopment())
+// Swagger (lad det være aktivt i Dev)
+app.UseSwagger(); // svarer på /swagger/v1/swagger.json
+app.UseSwaggerUI( c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint( "/swagger/v1/swagger.json", "BatchPay API v1" );
+    c.RoutePrefix = "swagger"; // UI på /swagger
+} );
 
+// (valgfrit) app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

@@ -1,22 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Shell
     x:Class="BatchPay.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:BatchPay">
+    xmlns:pages="clr-namespace:BatchPay.Pages">
 
-    <TabBar>
-        <!-- Hello World side -->
-        <ShellContent
-            Title="Home"
-            ContentTemplate="{DataTemplate local:MainPage}"
-            Route="main" />
-
-        <!-- Ordrer side -->
-        <ShellContent
-            Title="Ordrer"
-            ContentTemplate="{DataTemplate local:OrdersPage}"
-            Route="orders" />
-    </TabBar>
-
+    <!-- Forside -->
+    <ShellContent
+        Route="home"
+        ContentTemplate="{DataTemplate pages:HomePage}" />
 </Shell>

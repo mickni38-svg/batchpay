@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="BatchPay.Pages.VennerPage"
+    Title="Dine venner">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <!-- Topbar -->
+        <Grid BackgroundColor="{StaticResource ColorPanel}" Padding="12,10" Grid.Row="0">
+            <Label Text="Dine venner 2" TextColor="{StaticResource ColorText}" FontAttributes="Bold" FontSize="18"/>
+        </Grid>
+
+        <!-- Faner -->
+        <Grid Grid.Row="1" Padding="12,8,12,6">
+            <Grid ColumnDefinitions="*,*" HeightRequest="40" BackgroundColor="{StaticResource ColorRowAlt}" Padding="4">
+                <Button x:Name="TabFriendsBtn"
+                Grid.Column="0"
+                Text="Venner"
+                Clicked="OnTabFriendsClicked"
+                CornerRadius="14"
+                BackgroundColor="{StaticResource ColorRow}"
+                TextColor="{StaticResource ColorText}"
+                FontAttributes="Bold"/>
+                <Button x:Name="TabAllBtn"
+                Grid.Column="1"
+                Text="Alle brugere"
+                Clicked="OnTabAllClicked"
+                CornerRadius="14"
+                BackgroundColor="Transparent"
+                TextColor="{StaticResource ColorMuted}"/>
+            </Grid>
+        </Grid>
+
+        <!-- Global søg (kun aktiv på 'Alle') -->
+        <Grid x:Name="GlobalSearchBarHost" Grid.Row="2" Padding="12,0,12,6" IsVisible="False">
+            <Frame BackgroundColor="#0D2022" CornerRadius="14" Padding="8" HasShadow="False">
+                <SearchBar x:Name="GlobalSearchBar"
+                   Placeholder="Søg (min. 2 tegn)"
+                   TextChanged="OnGlobalSearchTextChanged"
+                   TextColor="{StaticResource ColorText}"
+                   PlaceholderColor="{StaticResource ColorMuted}" />
+            </Frame>
+        </Grid>
+
+        <!-- Personlig venneliste (default synlig) -->
+        <CollectionView x:Name="FriendsView"
+                    Grid.Row="3"
+                    ItemsSource="{Binding Friends}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="12,6,12,0" Padding="10" CornerRadius="16" HasShadow="False"
+                 BackgroundColor="{StaticResource ColorRow}">
+                        <Grid ColumnDefinitions="48,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Frame WidthRequest="40" HeightRequest="40" CornerRadius="20"
+                     BackgroundColor="{StaticResource ColorRowAlt}" Padding="0" VerticalOptions="Center">
+                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"/>
+                            </Frame>
+
+                            <Label Grid.Column="1" Text="{Binding FullName}" 
+                     TextColor="{StaticResource ColorText}" FontAttributes="Bold" FontSize="14"/>
+                            <Label Grid.Column="1" Grid.Row="1" Text="{Binding UserName}" 
+                     TextColor="{StaticResource ColorMuted}" FontSize="11"/>
+
+                            <Button Grid.Column="2" Grid.RowSpan="2"
+                      WidthRequest="40" HeightRequest="40" CornerRadius="20"
+                      BackgroundColor="{StaticResource ColorDanger}"
+                      Text="−"
+                      TextColor="White"
+                      Clicked="OnRemoveFriendClicked"
+                      CommandParameter="{Binding .}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Grid Padding="12">
+                    <Label Text="Ingen venner endnu." TextColor="{StaticResource ColorMuted}"/>
+                </Grid>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- Global liste (vises på 'Alle') -->
+        <CollectionView x:Name="AllUsersView"
+                    Grid.Row="3"
+                    IsVisible="False"
+                    ItemsSource="{Binding FilteredGlobalUsers}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="12,6,12,0" Padding="10" CornerRadius="16" HasShadow="False"
+                 BackgroundColor="{StaticResource ColorRow}">
+                        <Grid ColumnDefinitions="48,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10">
+                            <Frame WidthRequest="40" HeightRequest="40" CornerRadius="20"
+                     BackgroundColor="{StaticResource ColorRowAlt}" Padding="0" VerticalOptions="Center">
+                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill"/>
+                            </Frame>
+
+                            <Label Grid.Column="1" Text="{Binding FullName}" 
+                     TextColor="{StaticResource ColorText}" FontAttributes="Bold" FontSize="14"/>
+                            <Grid Grid.Column="1" Grid.Row="1" ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="6">
+                                <Label Text="{Binding UserName}" TextColor="{StaticResource ColorMuted}" FontSize="11"/>
+                                <Label Grid.Column="1" Text="online" TextColor="{StaticResource ColorMint}" FontSize="11"/>
+                                <Frame Grid.Column="2" Padding="6,2" CornerRadius="10" HasShadow="False"
+                       BackgroundColor="{StaticResource ColorPanel}">
+                                    <Label Text="NEW" TextColor="{StaticResource ColorAccent}" FontSize="11"/>
+                                </Frame>
+                            </Grid>
+
+                            <Button Grid.Column="2" Grid.RowSpan="2"
+                      WidthRequest="40" HeightRequest="40" CornerRadius="20"
+                      BackgroundColor="{StaticResource ColorDanger}"
+                      Text="+"
+                      TextColor="White"
+                      Clicked="OnAddFriendClicked"
+                      CommandParameter="{Binding .}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            <CollectionView.EmptyView>
+                <Grid Padding="12">
+                    <Label Text="Ingen brugere fundet." TextColor="{StaticResource ColorMuted}"/>
+                </Grid>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

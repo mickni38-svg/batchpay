@@ -1,0 +1,16 @@
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\bin\Debug\net8.0\BatchPayServiceLogic.deps.json
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\bin\Debug\net8.0\BatchPayServiceLogic.dll
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\bin\Debug\net8.0\BatchPayServiceLogic.pdb
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\bin\Debug\net8.0\Data.dll
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\bin\Debug\net8.0\Data.pdb
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.csproj.AssemblyReference.cache
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.AssemblyInfoInputs.cache
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.AssemblyInfo.cs
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.csproj.CoreCompileInputs.cache
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.sourcelink.json
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.csproj.CopyComplete
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.dll
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\refint\BatchPayServiceLogic.dll
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\BatchPayServiceLogic.pdb
+C:\Users\Michael\Documents\MINEPROJEKTER\BatchPayLogic\obj\Debug\net8.0\ref\BatchPayServiceLogic.dll

@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\UC1_UC2\UC1_UC2.md = ..\UC1_UC2\UC1_UC2.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BatchPayServiceLogic", "..\BatchPayLogic\BatchPayServiceLogic.csproj", "{A3537B94-5B4C-4C72-BA18-D8EAE0A1E82D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{3AD4211F-1C9E-47BB-922C-CF4B7477311B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AD4211F-1C9E-47BB-922C-CF4B7477311B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AD4211F-1C9E-47BB-922C-CF4B7477311B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3537B94-5B4C-4C72-BA18-D8EAE0A1E82D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3537B94-5B4C-4C72-BA18-D8EAE0A1E82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3537B94-5B4C-4C72-BA18-D8EAE0A1E82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3537B94-5B4C-4C72-BA18-D8EAE0A1E82D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

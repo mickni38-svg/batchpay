@@ -1,4 +1,6 @@
 ﻿using BatchPay;
+using BatchPay.Pages;
+using BatchPay.ViewModels;
 using CommunityToolkit.Maui;
 
 public static class MauiProgram
@@ -6,18 +8,30 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+
         builder
-            .UseMauiApp<App>()
-            // Initialize the .NET MAUI Community Toolkit by adding the below line of code
+            .UseMauiApp<App>()   // ← DEN HER MANGLEDE
             .UseMauiCommunityToolkit()
-            // After initializing the .NET MAUI Community Toolkit, optionally add additional fonts
             .ConfigureFonts( fonts =>
             {
                 fonts.AddFont( "OpenSans-Regular.ttf", "OpenSansRegular" );
                 fonts.AddFont( "OpenSans-Semibold.ttf", "OpenSansSemibold" );
             } );
 
-        // Continue initializing your .NET MAUI App here
+        // Views
+        builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<GroupPaymentPage>();
+        builder.Services.AddTransient<NotificationsPage>();
+        builder.Services.AddTransient<VennerPage>();
+
+        // ViewModels
+        builder.Services.AddTransient<HomeViewModel>();
+        builder.Services.AddTransient<GroupPaymentViewModel>();
+        builder.Services.AddTransient<NotificationsViewModel>();
+        builder.Services.AddTransient<VennerPageViewModel>();
+
+        // (valgfrit) Brug DI til Shell
+        builder.Services.AddSingleton<AppShell>();
 
         return builder.Build();
     }

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="BatchPay.Pages.NotificationsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodels="clr-namespace:BatchPay.ViewModels"
+    Title="Notifikationer">
+
+    <!-- POC: bind direkte til ViewModel -->
+    <ContentPage.BindingContext>
+        <viewmodels:NotificationsViewModel />
+    </ContentPage.BindingContext>
+
+    <!-- Enkle farver – justér til dit tema -->
+    <ContentPage.Resources>
+        <Color x:Key="BgCard">#0e1f22</Color>
+        <Color x:Key="ChipBg">#183237</Color>
+        <Color x:Key="TextMain">#E7F5F2</Color>
+        <Color x:Key="TextMuted">#9AB2AE</Color>
+        <Style TargetType="Frame" x:Key="Chip">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="HasShadow" Value="False"/>
+            <Setter Property="BackgroundColor" Value="{StaticResource ChipBg}"/>
+        </Style>
+        <Style TargetType="Button" x:Key="PrimaryBtn">
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+        <Style TargetType="Button" x:Key="SecondaryBtn" BasedOn="{StaticResource PrimaryBtn}">
+            <Setter Property="BackgroundColor" Value="#314247"/>
+            <Setter Property="TextColor" Value="{StaticResource TextMain}"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <RefreshView Command="{Binding RefreshCommand}">
+        <CollectionView
+            ItemsSource="{Binding Requests}"
+            SelectionMode="None">
+
+            <CollectionView.EmptyView>
+                <Grid Padding="24">
+                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center" VerticalOptions="Center">
+                        <Label Text="Ingen anmodninger" FontSize="18" FontAttributes="Bold" Opacity="0.9" TextColor="{StaticResource TextMain}"/>
+                        <Label Text="Du får besked her, når nogen inviterer dig eller sender en venneanmodning."
+                               FontSize="12" Opacity="0.6" HorizontalTextAlignment="Center" TextColor="{StaticResource TextMuted}"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate xmlns:viewmodels="clr-namespace:BatchPay.ViewModels">
+                    <Grid Padding="14"
+                          RowDefinitions="Auto,Auto,Auto"
+                          ColumnDefinitions="*,Auto"
+                          BackgroundColor="{StaticResource BgCard}"
+                          Margin="0,6">
+
+                        <!-- Type-chip -->
+                        <Frame Grid.ColumnSpan="2" Style="{StaticResource Chip}" Margin="0,0,0,8">
+                            <Label Text="{Binding TypeLabel}" FontSize="11" TextColor="{StaticResource TextMain}"/>
+                        </Frame>
+
+                        <!-- Tekster -->
+                        <Label Grid.Row="1"
+                               Text="{Binding Title}"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextMain}" />
+                        <Label Grid.Row="2"
+                               Text="{Binding Subtitle}"
+                               FontSize="12"
+                               TextColor="{StaticResource TextMuted}" />
+
+                        <!-- Handlinger (knapper) til højre -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Spacing="8">
+
+                            <!-- Set A: FriendIncoming → Godkend / Afvis -->
+                            <HorizontalStackLayout x:Name="IncomingActions" Spacing="8">
+                                <Button Text="Godkend"
+                                        Style="{StaticResource PrimaryBtn}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRequestCommand}"
+                                        CommandParameter="{Binding}" />
+                                <Button Text="Afvis"
+                                        Style="{StaticResource SecondaryBtn}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineRequestCommand}"
+                                        CommandParameter="{Binding}" />
+                            </HorizontalStackLayout>
+
+                            <!-- Set B: FriendSent → Annullér -->
+                            <HorizontalStackLayout x:Name="SentActions" Spacing="8">
+                                <Button Text="Annullér"
+                                        Style="{StaticResource SecondaryBtn}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineRequestCommand}"
+                                        CommandParameter="{Binding}" />
+                            </HorizontalStackLayout>
+
+                            <!-- Set C: GroupInvite → Tilmeld / Annullér -->
+                            <HorizontalStackLayout x:Name="GroupActions" Spacing="8">
+                                <Button Text="Tilmeld"
+                                        Style="{StaticResource PrimaryBtn}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRequestCommand}"
+                                        CommandParameter="{Binding}" />
+                                <Button Text="Annullér"
+                                        Style="{StaticResource SecondaryBtn}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.DeclineRequestCommand}"
+                                        CommandParameter="{Binding}" />
+                            </HorizontalStackLayout>
+
+                        </VerticalStackLayout>
+
+                        <!-- Synlighed styres pr. type -->
+                        <Grid.Triggers>
+                            <DataTrigger TargetType="Grid"
+                                         Binding="{Binding Kind}"
+                                         Value="{x:Static viewmodels:RequestKind.FriendIncoming}">
+                                <Setter TargetName="IncomingActions" Property="IsVisible" Value="True" />
+                                <Setter TargetName="SentActions" Property="IsVisible" Value="False" />
+                                <Setter TargetName="GroupActions" Property="IsVisible" Value="False" />
+                            </DataTrigger>
+
+                            <DataTrigger TargetType="Grid"
+                                         Binding="{Binding Kind}"
+                                         Value="{x:Static viewmodels:RequestKind.FriendSent}">
+                                <Setter TargetName="IncomingActions" Property="IsVisible" Value="False" />
+                                <Setter TargetName="SentActions" Property="IsVisible" Value="True" />
+                                <Setter TargetName="GroupActions" Property="IsVisible" Value="False" />
+                            </DataTrigger>
+
+                            <DataTrigger TargetType="Grid"
+                                         Binding="{Binding Kind}"
+                                         Value="{x:Static viewmodels:RequestKind.GroupInvite}">
+                                <Setter TargetName="IncomingActions" Property="IsVisible" Value="False" />
+                                <Setter TargetName="SentActions" Property="IsVisible" Value="False" />
+                                <Setter TargetName="GroupActions" Property="IsVisible" Value="True" />
+                            </DataTrigger>
+                        </Grid.Triggers>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>
