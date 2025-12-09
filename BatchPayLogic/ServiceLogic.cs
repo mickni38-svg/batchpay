@@ -1,14 +1,18 @@
-﻿using BatchPay.Api.Dtos;
+﻿using BatchPay.ServiceLogic.Dtos;
+using BatchPay.ServiceLogic.Interface;
+using BatchPayServiceLogic.Dtos;
 using Data;
 using Data.Model;
 using Microsoft.EntityFrameworkCore;
-namespace BatchPayLogic
+
+namespace BatchPay.ServiceLogic
 {
     public class ServiceLogic : IServiceLogic
     {
         private readonly BatchPayContext _db;
 
         public ServiceLogic( BatchPayContext db ) { _db = db; }
+
 
         public async Task<List<UserLiteDto>> GetAllUsers( bool removeFriendsFromList = false )
         {
@@ -23,12 +27,12 @@ namespace BatchPayLogic
 
 
             var mappedList = userList.Select( u => new UserLiteDto
-                {
-                    UserName = u.Email,
-                    UserId = u.UserId,
-                    FullName = u.Name,
-                    AvatarUrl = u.AvatarUrl
-                } ).ToList();
+            {
+                UserName = u.Email,
+                UserId = u.UserId,
+                FullName = u.Name,
+                AvatarUrl = u.AvatarUrl
+            } ).ToList();
 
             return mappedList;
         }
@@ -73,6 +77,38 @@ namespace BatchPayLogic
               .ToListAsync();
 
             return list;
+        }
+
+        public async Task<CreateGroupOrderResponse> CreateGroupOrderAsync( CreateGroupOrderRequest request )
+        {
+            // TODO: Her skal du senere oprette rigtig GroupOrder i databasen.
+            // Lige nu laver vi en dummy så frontend kan virke.
+
+            await Task.CompletedTask;
+
+            // Dummy: brug fx random kode – senere genererer du rigtigt id + kode fra DB
+            var dummyId = 1;
+            var dummyCode = "ABC123";
+
+            return new CreateGroupOrderResponse
+            {
+                GroupOrderId = dummyId,
+                GroupOrderCode = dummyCode
+            };
+        }
+
+        public async Task<AddOrderFromMerchantResponse?> AddOrderFromMerchantAsync( AddOrderFromMerchantRequest request )
+        {
+            await Task.CompletedTask;
+
+            return new AddOrderFromMerchantResponse
+            {
+                GroupOrderId = 42,
+                ParticipantId = 1337,
+                Status = "OrderAdded",
+                Message = "Dummy implementation – replace with real logic.",
+                AllParticipantsHaveOrders = false
+            };
         }
 
     }

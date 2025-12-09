@@ -1,4 +1,5 @@
 ﻿using BatchPay.Models;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace FrontendServices
@@ -14,8 +15,8 @@ namespace FrontendServices
         public BatchPayService()
         {
 #if ANDROID
-    var baseUrl = "http://10.0.2.2:5000/";
-    _http = new HttpClient { BaseAddress = new Uri(baseUrl) };
+            var baseUrl = "http://10.0.2.2:5000/";
+            _http = new HttpClient { BaseAddress = new Uri(baseUrl) };
 #else
             _http = new HttpClient { BaseAddress = new Uri( "http://localhost:5000/" ) };
 #endif
@@ -23,16 +24,25 @@ namespace FrontendServices
             System.Diagnostics.Debug.WriteLine( $"[BatchPayService] BaseAddress = {_http.BaseAddress}" );
             _http.DefaultRequestHeaders.Remove( "X-UserId" );
             _http.DefaultRequestHeaders.Add( "X-UserId", "13" );
-
         }
 
-        // Brug helper så vi ser status/body hvis noget fejler
+        // Helper til GET (har du allerede)
         private static async Task<T> GetJson<T>( HttpClient http, string url )
         {
             var resp = await http.GetAsync( url );
             var body = await resp.Content.ReadAsStringAsync();
             if (!resp.IsSuccessStatusCode)
                 throw new HttpRequestException( $"GET {http.BaseAddress}{url} -> {(int)resp.StatusCode} {resp.ReasonPhrase}\n{body}" );
+            return JsonSerializer.Deserialize<T>( body, JsonOpts )!;
+        }
+
+        // NY helper til POST med JSON
+        private static async Task<T?> PostJson<T>( HttpClient http, string url, object payload )
+        {
+            var resp = await http.PostAsJsonAsync( url, payload );
+            var body = await resp.Content.ReadAsStringAsync();
+            if (!resp.IsSuccessStatusCode)
+                throw new HttpRequestException( $"POST {http.BaseAddress}{url} -> {(int)resp.StatusCode} {resp.ReasonPhrase}\n{body}" );
             return JsonSerializer.Deserialize<T>( body, JsonOpts );
         }
 
@@ -66,5 +76,9 @@ namespace FrontendServices
             }
             return true;
         }
+
+        // NY: kald til /api/GroupOrders/create
+        public Task<CreateGroupOrderResponse?> CreateGroupOrderAsync( CreateGroupOrderRequest request )
+            => PostJson<CreateGroupOrderResponse?>( _http, "api/GroupOrders/create", request );
     }
 }

@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BatchPayLogic\BatchPayServiceLogic.csproj" />
+    <ProjectReference Include="..\BatchPayLogic\BatchPay.ServiceLogic.csproj" />
   </ItemGroup>
     
 

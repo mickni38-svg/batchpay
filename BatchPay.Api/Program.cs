@@ -1,4 +1,5 @@
-﻿using BatchPayLogic;
+﻿using BatchPay.ServiceLogic;
+using BatchPay.ServiceLogic.Interface;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<BatchPayContext>( opt =>
 );
 
 builder.Services.AddScoped<IServiceLogic, ServiceLogic>();
+
 
 // Controllers + Swagger
 builder.Services.AddControllers();
