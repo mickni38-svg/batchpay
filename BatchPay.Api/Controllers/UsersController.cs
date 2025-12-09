@@ -1,5 +1,5 @@
 ﻿using BatchPay.Api.Dtos;
-using BatchPayLogic;
+using BatchPay.ServiceLogic.Interface;
 using Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿namespace BatchPay.Api.Dtos
+﻿namespace BatchPay.ServiceLogic.Dtos
 {
     public class UserLiteDto
     {

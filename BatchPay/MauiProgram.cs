@@ -2,6 +2,7 @@
 using BatchPay.Pages;
 using BatchPay.ViewModels;
 using CommunityToolkit.Maui;
+using FrontendServices;
 
 public static class MauiProgram
 {
@@ -32,6 +33,10 @@ public static class MauiProgram
 
         // (valgfrit) Brug DI til Shell
         builder.Services.AddSingleton<AppShell>();
+
+        builder.Services.AddSingleton<IBatchPayService, BatchPayService>();
+
+        builder.Services.AddSingleton<IBatchPayService, BatchPayService>();
 
         return builder.Build();
     }
