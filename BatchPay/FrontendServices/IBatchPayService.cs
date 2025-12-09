@@ -9,5 +9,6 @@ namespace FrontendServices
         Task<IReadOnlyList<UserLite>> GetFriendsAsync();
         Task<bool> AddFriendAsync( int userId );
         Task<bool> RemoveFriendAsync( int userId );
+        Task<CreateGroupOrderResponse?> CreateGroupOrderAsync( CreateGroupOrderRequest request );
     }
 }
