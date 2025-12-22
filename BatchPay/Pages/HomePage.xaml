@@ -21,6 +21,7 @@
             <Button Text="Mine venner" Command="{Binding GoToFriendsCommand}" />
             <Button Text="Gruppebetaling" Command="{Binding GoToGroupPaymentCommand}" />
             <Button Text="Notifikationer" Command="{Binding GoToNotificationsCommand}" />
+            <Button Text="Mine ordrer" Clicked="OnOrdersClicked" />
         </VerticalStackLayout>
 
         <!-- Lidt POC-dummy-info fra VM -->

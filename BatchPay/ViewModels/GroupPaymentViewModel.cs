@@ -9,6 +9,9 @@ namespace BatchPay.ViewModels;
 
 public partial class GroupPaymentViewModel : ObservableObject
 {
+    [ObservableProperty] private MerchantModel? selectedMerchant;
+    public ObservableCollection<MerchantModel> Merchants { get; } = new();
+
     private readonly IBatchPayService _batchPayService;
 
     [ObservableProperty]
@@ -27,13 +30,16 @@ public partial class GroupPaymentViewModel : ObservableObject
 
     private bool _hasLoaded;
 
+
     public GroupPaymentViewModel( IBatchPayService batchPayService )
     {
         _batchPayService = batchPayService;
 
         LoadCommand = new AsyncRelayCommand( LoadAsync );
         CreateGroupOrderCommand = new AsyncRelayCommand( CreateGroupOrderAsync );
+
     }
+
 
     private async Task LoadAsync()
     {

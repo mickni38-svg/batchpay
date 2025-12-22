@@ -49,46 +49,46 @@ public partial class NotificationsViewModel : ObservableObject
     public NotificationsViewModel()
     {
         // 🔹 Dummydata
-        Requests.Add( new RequestItem
-        {
-            Id = 11,
-            Kind = RequestKind.FriendIncoming,
-            Title = "Jonas K.",
-            Subtitle = "har sendt dig en venneanmodning",
-            SentAtUtc = DateTime.UtcNow.AddMinutes( -30 )
-        } );
-        Requests.Add( new RequestItem
-        {
-            Id = 12,
-            Kind = RequestKind.FriendIncoming,
-            Title = "Sofie D.",
-            Subtitle = "har sendt dig en venneanmodning",
-            SentAtUtc = DateTime.UtcNow.AddHours( -5 )
-        } );
-        Requests.Add( new RequestItem
-        {
-            Id = 1,
-            Kind = RequestKind.FriendSent,
-            Title = "Maja H.",
-            Subtitle = "afventer godkendelse",
-            SentAtUtc = DateTime.UtcNow.AddHours( -3 )
-        } );
-        Requests.Add( new RequestItem
-        {
-            Id = 21,
-            Kind = RequestKind.GroupInvite,
-            Title = "Tonys Pizza",
-            Subtitle = "Inviteret af Laura",
-            SentAtUtc = DateTime.UtcNow.AddMinutes( -25 )
-        } );
-        Requests.Add( new RequestItem
-        {
-            Id = 22,
-            Kind = RequestKind.GroupInvite,
-            Title = "Fredagsbar",
-            Subtitle = "Inviteret af Ali",
-            SentAtUtc = DateTime.UtcNow.AddHours( -2 )
-        } );
+        //Requests.Add( new RequestItem
+        //{
+        //    Id = 11,
+        //    Kind = RequestKind.FriendIncoming,
+        //    Title = "Jonas K.",
+        //    Subtitle = "har sendt dig en venneanmodning",
+        //    SentAtUtc = DateTime.UtcNow.AddMinutes( -30 )
+        //} );
+        //Requests.Add( new RequestItem
+        //{
+        //    Id = 12,
+        //    Kind = RequestKind.FriendIncoming,
+        //    Title = "Sofie D.",
+        //    Subtitle = "har sendt dig en venneanmodning",
+        //    SentAtUtc = DateTime.UtcNow.AddHours( -5 )
+        //} );
+        //Requests.Add( new RequestItem
+        //{
+        //    Id = 1,
+        //    Kind = RequestKind.FriendSent,
+        //    Title = "Maja H.",
+        //    Subtitle = "afventer godkendelse",
+        //    SentAtUtc = DateTime.UtcNow.AddHours( -3 )
+        //} );
+        //Requests.Add( new RequestItem
+        //{
+        //    Id = 21,
+        //    Kind = RequestKind.GroupInvite,
+        //    Title = "Tonys Pizza",
+        //    Subtitle = "Inviteret af Laura",
+        //    SentAtUtc = DateTime.UtcNow.AddMinutes( -25 )
+        //} );
+        //Requests.Add( new RequestItem
+        //{
+        //    Id = 22,
+        //    Kind = RequestKind.GroupInvite,
+        //    Title = "Fredagsbar",
+        //    Subtitle = "Inviteret af Ali",
+        //    SentAtUtc = DateTime.UtcNow.AddHours( -2 )
+        //} );
     }
 
     [RelayCommand] private Task RefreshAsync() => Task.Delay( 300 );

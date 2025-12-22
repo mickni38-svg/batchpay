@@ -65,6 +65,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Pages\OrdersPage.xaml.cs">
+	    <DependentUpon>OrdersPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Pages\GroupPaymentCreatePage.xaml.cs">
+	    <DependentUpon>GroupPaymentCreatePage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Pages\HomePage.xaml.cs">
 	    <DependentUpon>HomePage.xaml</DependentUpon>
 	  </Compile>
@@ -74,10 +80,19 @@
 	  <Compile Update="Pages\NotificationPage.xaml.cs">
 	    <DependentUpon>NotificationPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="ViewModels\OrdersViewModel.cs">
+	    <DependentUpon>%(Filename)</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiXaml Update="App.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\OrdersPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\GroupPaymentCreatePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\HomePage.xaml">

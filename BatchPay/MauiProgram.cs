@@ -1,5 +1,6 @@
 ﻿using BatchPay;
 using BatchPay.Pages;
+using BatchPay.Stores;
 using BatchPay.ViewModels;
 using CommunityToolkit.Maui;
 using FrontendServices;
@@ -36,7 +37,16 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IBatchPayService, BatchPayService>();
 
-        builder.Services.AddSingleton<IBatchPayService, BatchPayService>();
+
+        builder.Services.AddSingleton<GroupOrderStore>();
+
+        builder.Services.AddTransient<OrdersViewModel>();
+        builder.Services.AddTransient<OrdersPage>();
+
+        builder.Services.AddTransient<GroupPaymentCreateViewModel>();
+        builder.Services.AddTransient<GroupPaymentCreatePage>();
+
+
 
         return builder.Build();
     }

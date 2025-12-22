@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Name="CreatePage"
+    x:Class="BatchPay.Pages.GroupPaymentCreatePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Opret gruppebetaling">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+
+            <!-- ORDRE NAVN -->
+            <Label Text="Navn på gruppebetaling" FontAttributes="Bold" />
+            <Entry Placeholder="Fx: Pizzaaften"
+                   Text="{Binding Title}" />
+
+            <!-- VIRKSOMHED -->
+            <Label Text="Vælg virksomhed" FontAttributes="Bold" />
+            <Picker ItemsSource="{Binding Merchants}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedMerchant}" />
+
+            <!-- SØG VENNER -->
+            <Label Text="Tilføj deltagere" FontAttributes="Bold" />
+            <SearchBar Placeholder="Søg i dine venner"
+                       Text="{Binding FriendSearchText}"
+                       SearchCommand="{Binding SearchFriendsCommand}" />
+
+            <!-- LISTE OVER VENNER -->
+            <CollectionView ItemsSource="{Binding FilteredFriends}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10" ColumnDefinitions="*,Auto">
+                            <!-- ⚠️ Ret DisplayName hvis dit UserLite bruger et andet felt -->
+                            <Label Text="{Binding DisplayName}"
+                                   VerticalOptions="Center" />
+
+                            <Button Text="Tilføj"
+                                    Command="{Binding BindingContext.AddFriendCommand, Source={x:Reference CreatePage}}"
+                                    CommandParameter="{Binding}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- VIS VALGTE DELTAGERE SOM CHIPS -->
+            <Label Text="Valgte deltagere" FontAttributes="Bold" />
+
+            <CollectionView ItemsSource="{Binding SelectedFriends}"
+                            ItemsLayout="HorizontalList"
+                            HeightRequest="60">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10"
+                               CornerRadius="20"
+                               BackgroundColor="#2A2F36"
+                               BorderColor="#3A4048"
+                               HasShadow="False"
+                               Margin="0,0,8,0">
+                            <HorizontalStackLayout Spacing="8">
+                                <!-- ⚠️ Ret DisplayName hvis dit UserLite bruger et andet felt -->
+                                <Label Text="{Binding DisplayName}"
+                                       TextColor="White"
+                                       VerticalOptions="Center" />
+
+                                <Button Text="✕"
+                                        FontSize="12"
+                                        BackgroundColor="Transparent"
+                                        TextColor="White"
+                                        Command="{Binding BindingContext.RemoveFriendCommand, Source={x:Reference CreatePage}}"
+                                        CommandParameter="{Binding}" />
+                            </HorizontalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- OPRET -->
+            <Button Text="Opret gruppebetaling"
+                    CornerRadius="10"
+                    BackgroundColor="#2ECC71"
+                    TextColor="White"
+                    Command="{Binding CreateGroupCommand}" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}" />
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Violet"
+                   LineBreakMode="WordWrap" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
