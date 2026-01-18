@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell
+    x:Class="BatchPay.Frontend.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:BatchPay.Frontend.Views"
+    Shell.FlyoutBehavior="Disabled"
+    BackgroundColor="#0F0F10"
+
+    Shell.NavBarIsVisible="True"
+    Shell.NavBarHasShadow="False"
+
+    Shell.TabBarBackgroundColor="#071217"
+    Shell.TabBarForegroundColor="#E8F7F4"
+    Shell.TabBarTitleColor="#E8F7F4"
+    Shell.TabBarUnselectedColor="#667174"
+    Shell.TabBarDisabledColor="#333838">
+
+    <Shell.TitleView>
+        <!-- TitleView container -->
+        <Grid HeightRequest="78" Padding="0">
+
+            <!-- Baggrund i header (valgfri) -->
+            <Image Source="sharepay_header_bg.svg"
+                   Aspect="AspectFill"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill" />
+
+            <!-- Let overlay for læsbarhed -->
+            <BoxView BackgroundColor="#000000"
+                     Opacity="0.10"
+                     HorizontalOptions="Fill"
+                     VerticalOptions="Fill" />
+
+            <!-- ✅ FULL WIDTH header-bar (ingen margin -> "sync") -->
+            <Border HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    Background="#0B0B0D"
+                    Stroke="#1A1D22"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 0"
+                   />
+
+            <Grid ColumnDefinitions="Auto,*"
+                      ColumnSpacing="10"
+                      VerticalOptions="Center">
+
+                <!-- Logo (større og længere til venstre) -->
+                <Image Source="share_by_sharepay_logo.svg"
+                           HeightRequest="100"
+                           WidthRequest="250"
+                           Aspect="AspectFit"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start" />
+
+                <!-- Chips: kan scrolle hvis der ikke er plads -->
+                <ScrollView Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Center">
+
+                    <HorizontalStackLayout Spacing="8"
+                                               Padding="0,0,0,0"
+                                               VerticalOptions="Center">
+
+                        <!-- Venner -->
+                        <Border Background="#0E1116"
+                                    StrokeThickness="1.2"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="10,6">
+                            <Border.Stroke>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#56CCF2" Offset="0.0" />
+                                    <GradientStop Color="#2D9CDB" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Stroke>
+
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="4"
+                                           TextColor="#56CCF2"
+                                           FontAttributes="Bold"
+                                           FontSize="13"
+                                           VerticalOptions="Center"/>
+                                <Label Text="venner"
+                                           TextColor="#EDEDED"
+                                           FontSize="12"
+                                           VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Åbne -->
+                        <Border Background="#0E1116"
+                                    StrokeThickness="1.2"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="10,6">
+                            <Border.Stroke>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#79C957" Offset="0.0" />
+                                    <GradientStop Color="#2FAE7B" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Stroke>
+
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="2"
+                                           TextColor="#79C957"
+                                           FontAttributes="Bold"
+                                           FontSize="13"
+                                           VerticalOptions="Center"/>
+                                <Label Text="åbne"
+                                           TextColor="#EDEDED"
+                                           FontSize="12"
+                                           VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                        <!-- Beskeder -->
+                        <Border Background="#0E1116"
+                                    StrokeThickness="1.2"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="10,6">
+                            <Border.Stroke>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#9B51E0" Offset="0.0" />
+                                    <GradientStop Color="#2FAE7B" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Stroke>
+
+                            <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                                <Label Text="0"
+                                           TextColor="#9B51E0"
+                                           FontAttributes="Bold"
+                                           FontSize="13"
+                                           VerticalOptions="Center"/>
+                                <Label Text="besk."
+                                           TextColor="#EDEDED"
+                                           FontSize="12"
+                                           VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Border>
+
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+            </Grid>
+
+
+        </Grid>
+    </Shell.TitleView>
+
+    <TabBar>
+        <ShellContent Route="home" Title="Forside" Icon="tab_home.svg" ContentTemplate="{DataTemplate views:HomePage}" />
+        <ShellContent Route="overview" Title="Oversigt" Icon="tab_overview.svg" ContentTemplate="{DataTemplate views:OverviewPage}" />
+        <ShellContent Route="create" Title="Opret" Icon="tab_plus.svg" ContentTemplate="{DataTemplate views:CreateGroupPaymentPage}" />
+        <ShellContent Route="find" Title="Find" Icon="tab_add_users.svg" ContentTemplate="{DataTemplate views:FindPersonsPage}" />
+        <ShellContent Route="messages" Title="Beskeder" Icon="tab_messages.svg" ContentTemplate="{DataTemplate views:MessagesPage}" />
+    </TabBar>
+
+</Shell>

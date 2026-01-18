@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="BatchPay.Frontend.Views.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#000000"
+    Padding="0">
+
+    <Grid>
+
+        <!-- Baggrund -->
+        <Image Source="sharepay_home_bg.svg"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <!-- Content -->
+        <Grid Padding="16,16"
+              RowDefinitions="*,Auto,Auto"
+              RowSpacing="14">
+
+            <Grid Grid.Row="0"
+                  RowDefinitions="Auto,Auto"
+                  ColumnDefinitions="*,*"
+                  RowSpacing="14"
+                  ColumnSpacing="14"
+                  VerticalOptions="Center">
+
+                <!-- ===================== OVERBLIK ===================== -->
+                <Grid Grid.Row="0" Grid.Column="0" HeightRequest="140">
+
+                    <!-- Neon outline -->
+                    <Border StrokeThickness="2"
+                            StrokeShape="RoundRectangle 22"
+                            Padding="0"
+                            Opacity="0.85">
+                        <Border.Stroke>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#F2C94C" Offset="0.0" />
+                                <GradientStop Color="#F2994A" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                    </Border>
+
+                    <!-- Card -->
+                    <Border Stroke="#2A313B"
+                            StrokeThickness="1.6"
+                            Background="#0B0B0D"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="12"
+                            Margin="2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOverblikTapped" />
+                        </Border.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="10"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center">
+
+                            <Border WidthRequest="74" HeightRequest="74"
+                                    Stroke="#3A4452"
+                                    StrokeThickness="2"
+                                    Background="#0E1116"
+                                    StrokeShape="RoundRectangle 37">
+                                <Image Source="sharepay_overview.svg"
+                                       WidthRequest="56"
+                                       HeightRequest="56"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+
+                            <!-- ✅ Label under ikon -->
+                            <Label Text="Overblik"
+                                   TextColor="#EDEDED"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ===================== OPRET ===================== -->
+                <Grid Grid.Row="0" Grid.Column="1" HeightRequest="140">
+
+                    <Border StrokeThickness="2"
+                            StrokeShape="RoundRectangle 22"
+                            Padding="0"
+                            Opacity="0.85">
+                        <Border.Stroke>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#79C957" Offset="0.0" />
+                                <GradientStop Color="#2FAE7B" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                    </Border>
+
+                    <Border Stroke="#2A313B"
+                            StrokeThickness="1.6"
+                            Background="#0B0B0D"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="12"
+                            Margin="2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnOpretTapped" />
+                        </Border.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="10"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center">
+
+                            <Border WidthRequest="74" HeightRequest="74"
+                                    Stroke="#3A4452"
+                                    StrokeThickness="2"
+                                    Background="#0E1116"
+                                    StrokeShape="RoundRectangle 37">
+                                <Image Source="sharepay_create.svg"
+                                       WidthRequest="56"
+                                       HeightRequest="56"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+
+                            <Label Text="Opret"
+                                   TextColor="#EDEDED"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ===================== BRUGERE ===================== -->
+                <Grid Grid.Row="1" Grid.Column="0" HeightRequest="140">
+
+                    <Border StrokeThickness="2"
+                            StrokeShape="RoundRectangle 22"
+                            Padding="0"
+                            Opacity="0.82">
+                        <Border.Stroke>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#56CCF2" Offset="0.0" />
+                                <GradientStop Color="#2D9CDB" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                    </Border>
+
+                    <Border Stroke="#2A313B"
+                            StrokeThickness="1.6"
+                            Background="#0B0B0D"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="12"
+                            Margin="2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBrugereTapped" />
+                        </Border.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="10"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center">
+
+                            <Border WidthRequest="74" HeightRequest="74"
+                                    Stroke="#3A4452"
+                                    StrokeThickness="2"
+                                    Background="#0E1116"
+                                    StrokeShape="RoundRectangle 37">
+                                <Image Source="sharepay_users.svg"
+                                       WidthRequest="56"
+                                       HeightRequest="56"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+
+                            <Label Text="Brugere"
+                                   TextColor="#EDEDED"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ===================== BESKEDER ===================== -->
+                <Grid Grid.Row="1" Grid.Column="1" HeightRequest="140">
+
+                    <Border StrokeThickness="2"
+                            StrokeShape="RoundRectangle 22"
+                            Padding="0"
+                            Opacity="0.82">
+                        <Border.Stroke>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#9B51E0" Offset="0.0" />
+                                <GradientStop Color="#2FAE7B" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Stroke>
+                    </Border>
+
+                    <Border Stroke="#2A313B"
+                            StrokeThickness="1.6"
+                            Background="#0B0B0D"
+                            StrokeShape="RoundRectangle 20"
+                            Padding="12"
+                            Margin="2">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBeskederTapped" />
+                        </Border.GestureRecognizers>
+
+                        <VerticalStackLayout Spacing="10"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center">
+
+                            <Border WidthRequest="74" HeightRequest="74"
+                                    Stroke="#3A4452"
+                                    StrokeThickness="2"
+                                    Background="#0E1116"
+                                    StrokeShape="RoundRectangle 37">
+                                <Image Source="sharepay_messages.svg"
+                                       WidthRequest="56"
+                                       HeightRequest="56"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+
+                            <Label Text="Beskeder"
+                                   TextColor="#EDEDED"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+            </Grid>
+
+            <!-- Log ind -->
+            <Button Grid.Row="1"
+                    Text="Log ind"
+                    HeightRequest="54"
+                    CornerRadius="20"
+                    BackgroundColor="#0B0B0D"
+                    BorderColor="#2A313B"
+                    BorderWidth="1.6"
+                    TextColor="#EDEDED"
+                    FontSize="15"
+                    FontAttributes="Bold"
+                    Clicked="OnLoginClicked" />
+
+            <!-- Opret dig -->
+            <Label Grid.Row="2"
+                   Text="Opret dig som bruger"
+                   TextColor="#2FAE7B"
+                   FontSize="13"
+                   HorizontalTextAlignment="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnSignupTapped" />
+                </Label.GestureRecognizers>
+            </Label>
+
+        </Grid>
+    </Grid>
+</ContentPage>
