@@ -165,7 +165,7 @@ dotnet restore
 dotnet run
 ```
 
-The API will be available at `https://localhost:7xxx` with Swagger UI at `/swagger`.
+The API will be available at `https://localhost:5001` (or `http://localhost:5000`) with Swagger UI at `/swagger`.
 
 ### Running the MAUI App
 
@@ -187,7 +187,7 @@ The API will be available at `https://localhost:7xxx` with Swagger UI at `/swagg
 6. UI updates to show "Afventer..." (Pending) badge
 7. Selected user appears in friends overview with Pending status
 
-See detailed use case: [UC1_UC2/UC1_UC2.md](UC1_UC2/UC1_UC2.md)
+See detailed use case: [UC1_UC2/UC1_UC2.md](./UC1_UC2/UC1_UC2.md)
 
 ### Create Group Payment
 
