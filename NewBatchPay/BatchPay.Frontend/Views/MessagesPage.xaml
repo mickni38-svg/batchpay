@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="BatchPay.Frontend.Views.MessagesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#000000"
+    Padding="16">
+
+    <Grid RowDefinitions="Auto,*" RowSpacing="12">
+
+        <Frame Grid.Row="0"
+               BackgroundColor="#0B0B0D"
+               BorderColor="#1A1D22"
+               CornerRadius="16"
+               HasShadow="False"
+               Padding="14">
+            <VerticalStackLayout Spacing="6">
+                <Label Text="Beskeder"
+                       TextColor="#EDEDED"
+                       FontSize="18"
+                       FontAttributes="Bold" />
+                <Label Text="Kommer snart 🙂"
+                       TextColor="#9AA0A6"
+                       FontSize="13" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <Frame Grid.Row="1"
+               BackgroundColor="#0B0B0D"
+               BorderColor="#1A1D22"
+               CornerRadius="16"
+               HasShadow="False"
+               Padding="14">
+            <Label Text="Her kommer dine beskeder og notifikationer senere."
+                   TextColor="#9AA0A6"
+                   FontSize="13" />
+        </Frame>
+
+    </Grid>
+</ContentPage>
