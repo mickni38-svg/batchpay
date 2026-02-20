@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace BatchPay.Frontend.Models;
 
-public partial class SelectableDirectoryEntry : ObservableObject
+public class SelectableDirectoryEntry : ObservableObject
 {
     public DirectoryEntryType Type { get; }
     public int Id { get; }
@@ -23,8 +23,14 @@ public partial class SelectableDirectoryEntry : ObservableObject
     /// </summary>
     public bool IsSelectable => true;
 
-    [ObservableProperty]
-    private bool isSelected;
+    // The [ObservableProperty] attribute has been removed.
+    // The IsSelected property is now implemented manually below.
+    private bool _isSelected;
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
+    }
 
     public string Initials { get; }
     public string AvatarColor { get; }

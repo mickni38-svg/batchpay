@@ -1,16 +1,12 @@
 ﻿namespace BatchPay.Contracts.Dto;
 
 /// <summary>
-/// IMPORTANT:
-/// Request DTO når frontend opretter en gruppebetaling.
-/// IconKey vælges af brugeren via ikon-picker.
+/// DTO for creating a new group payment.
 /// </summary>
 public sealed record CreateGroupPaymentRequestDto(
     string Title,
     string? Message,
     int CreatedByUserId,
+    IReadOnlyList<int> MemberIds,
     string IconKey,
-    bool IsActive,
-    DateTime CreatedAtUtc,
-    IReadOnlyList<int> MemberUserIds
-);
+    bool IsActive);

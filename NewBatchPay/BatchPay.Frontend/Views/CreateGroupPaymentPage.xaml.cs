@@ -4,7 +4,7 @@ namespace BatchPay.Frontend.Views;
 
 public partial class CreateGroupPaymentPage : ContentPage
 {
-    public CreateGroupPaymentPage( CreateGroupPaymentViewModel vm )
+    public CreateGroupPaymentPage( CreateGroupViewModel vm )
     {
         InitializeComponent();
         BindingContext = vm;
@@ -14,7 +14,7 @@ public partial class CreateGroupPaymentPage : ContentPage
     {
         base.OnAppearing();
 
-        if (BindingContext is CreateGroupPaymentViewModel vm)
+        if (BindingContext is CreateGroupViewModel vm)
         {
             // CommunityToolkit: [RelayCommand] private Task LoadAsync()
             // => genererer public IAsyncRelayCommand LoadCommand

@@ -1,3 +1,4 @@
-﻿namespace BatchPay.Contracts.Dto;
+namespace BatchPay.Contracts.Dto;
 
-public sealed record AddFriendRequestDto( int RequesterUserId, int ReceiverUserId );
+// MODIFIED: Renamed properties to match the new generic model.
+public sealed record AddFriendRequestDto(int RequesterId, int ReceiverId);

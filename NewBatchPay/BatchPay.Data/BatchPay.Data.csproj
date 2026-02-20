@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
-    <ItemGroup>
+     <ItemGroup>
         <ProjectReference Include="..\BatchPay.Contracts\BatchPay.Contracts.csproj" />
     </ItemGroup>
 

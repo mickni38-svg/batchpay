@@ -1,13 +1,17 @@
-﻿namespace BatchPay.Data.Entities;
+using BatchPay.Contracts.Dto;
+using System;
+
+namespace BatchPay.Data.Entities;
 
 public sealed class FriendRequestEntity
-{
-    public int Id { get; set; }
-    public int RequesterUserId { get; set; }
-    public int ReceiverUserId { get; set; }
-    public byte Status { get; set; } // 1=Accepted, 0=Pending, 2=Declined
-    public DateTime CreatedAtUtc { get; set; }
+{    public int Id { get; set; }
+    public byte Status { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public UserEntity? Requester { get; set; }
-    public UserEntity? Receiver { get; set; }
+    // MODIFIED: Foreign keys are now generic
+    public int RequesterId { get; set; }
+    public int ReceiverId { get; set; }
+
+    public DirectoryEntryEntity Requester { get; set; } = null!;
+    public DirectoryEntryEntity Receiver { get; set; } = null!;
 }

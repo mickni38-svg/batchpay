@@ -11,14 +11,14 @@ public sealed class BatchPayApiClient( HttpClient http )
     public async Task<List<DirectoryEntryDto>> GetDirectoryAsync( CancellationToken ct )
     => await http.GetFromJsonAsync<List<DirectoryEntryDto>>( "/api/directory", ct ) ?? new();
 
-    public async Task<List<UserDto>> GetFriendsAsync( int requesterUserId, CancellationToken ct )
-        => await http.GetFromJsonAsync<List<UserDto>>( $"/api/friends/{requesterUserId}", ct ) ?? new();
+    public async Task<List<UserDto>> GetFriendsAsync( int requesterId, CancellationToken ct )
+        => await http.GetFromJsonAsync<List<UserDto>>( $"/api/friends/{requesterId}", ct ) ?? new();
 
-    public async Task<bool> AddFriendAsync( int requesterUserId, int receiverUserId, CancellationToken ct )
+    public async Task<bool> AddFriendAsync( int requesterId, int receiverId, CancellationToken ct )
     {
         var res = await http.PostAsJsonAsync(
             "api/friends",
-            new AddFriendRequestDto( requesterUserId, receiverUserId ),
+            new AddFriendRequestDto( requesterId, receiverId ),
             ct );
 
         return res.IsSuccessStatusCode;

@@ -33,14 +33,19 @@ var apiBase = "http://localhost:5000/";
 
         builder.Services.AddSingleton<BatchPayApiClient>();
 
-        builder.Services.AddTransient<CreateGroupPaymentViewModel>();
+        //builder.Services.AddTransient<CreateGroupPaymentViewModel>();
         builder.Services.AddTransient<FindPersonsViewModel>();
+        builder.Services.AddTransient<CreateGroupViewModel>();
+        builder.Services.AddTransient<OverviewViewModel>();
+        builder.Services.AddTransient<GroupPaymentsViewModel>();
+        //builder.Services.AddTransient<MessagesViewModel>();
 
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<CreateGroupPaymentPage>();
         builder.Services.AddTransient<FindPersonsPage>();
-        builder.Services.AddTransient<OverviewViewModel>();
         builder.Services.AddTransient<OverviewPage>();
+
+
         //builder.Services.AddTransient<MessagesPage>();
         builder.Services.AddSingleton<AppShell>();
 

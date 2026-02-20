@@ -27,18 +27,15 @@ public sealed class DatabaseSeeder( BatchPayContext db )
             }
         };
 
-        var existingHandles = await db.Merchants
+        // MODIFIED: Query the base DbSet and filter by type
+        var existingMerchantHandles = await db.DirectoryEntries
+            .OfType<MerchantEntity>()
             .Select( m => m.Handle )
-            .ToListAsync( ct );
-
-        var existingSet = new HashSet<string>(
-            existingHandles,
-            StringComparer.OrdinalIgnoreCase
-        );
+            .ToHashSetAsync( StringComparer.OrdinalIgnoreCase, ct );
 
         foreach (var m in merchants)
         {
-            if (existingSet.Contains( m.Handle ))
+            if (existingMerchantHandles.Contains( m.Handle ))
                 continue;
 
             var merchant = new MerchantEntity
@@ -49,12 +46,13 @@ public sealed class DatabaseSeeder( BatchPayContext db )
                 ContactEmail = m.ContactEmail,
                 City = m.City,
                 CountryCode = "DK",
-                IsActive = true,
-                CreatedAtUtc = DateTime.UtcNow
+                IsActive = true
+                // CreatedAtUtc is likely handled by the database or entity constructor now
             };
 
-            db.Merchants.Add( merchant );
-            await db.SaveChangesAsync( ct ); // så vi får merchant.Id
+            // MODIFIED: Add to the base DbSet
+            db.DirectoryEntries.Add( merchant );
+            await db.SaveChangesAsync( ct ); // so we get merchant.Id
 
             var integration = new MerchantIntegrationEntity
             {
@@ -64,8 +62,8 @@ public sealed class DatabaseSeeder( BatchPayContext db )
                 AllowedOrigin = merchant.WebsiteUrl,
                 ApiKeyHash = $"DEV_API_KEY_{merchant.Handle.ToUpperInvariant()}",
                 SigningSecretHash = $"DEV_SECRET_{merchant.Handle.ToUpperInvariant()}",
-                IsEnabled = true,
-                UpdatedAtUtc = DateTime.UtcNow
+                IsEnabled = true
+                // UpdatedAtUtc is likely handled by the database or entity constructor now
             };
 
             db.MerchantIntegrations.Add( integration );
@@ -100,17 +98,23 @@ public sealed class DatabaseSeeder( BatchPayContext db )
             ("William Skov", "william"),
         };
 
-        var existing = await db.Users.Select( u => u.Handle ).ToListAsync( ct );
+        // MODIFIED: Query the base DbSet and filter by type
+        var existing = await db.DirectoryEntries
+            .OfType<UserEntity>()
+            .Select( u => u.Handle )
+            .ToListAsync( ct );
         var set = new HashSet<string>( existing, StringComparer.OrdinalIgnoreCase );
 
         foreach (var (name, handle) in seed)
         {
             if (set.Contains( handle )) continue;
 
-            db.Users.Add( new Entities.UserEntity
+            // MODIFIED: Add to the base DbSet
+            db.DirectoryEntries.Add( new UserEntity
             {
                 DisplayName = name,
-                Handle = handle
+                Handle = handle,
+                Email = $"{handle}@example.com" // Email is now a required field
             } );
         }
 

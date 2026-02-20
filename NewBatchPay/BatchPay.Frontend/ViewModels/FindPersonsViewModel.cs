@@ -65,7 +65,7 @@ public partial class FindPersonsViewModel : ObservableObject
                     continue;
 
                 // skjul allerede-venner (users)
-                if (dto.Type == DirectoryEntryType.User && friendIds.Contains( dto.Id ))
+                if (friendIds.Contains( dto.Id ))
                     continue;
 
                 AllEntries.Add( new SelectableDirectoryEntry( dto ) );
@@ -121,9 +121,8 @@ public partial class FindPersonsViewModel : ObservableObject
     {
         if (IsBusy) return;
 
-        // Kun USERS kan tilføjes som venner (merchants senere som "følg")
         var selectedUsers = AllEntries
-            .Where( x => x.IsUser && x.IsSelected )
+            .Where( x =>  x.IsSelected )
             .ToList();
 
         if (selectedUsers.Count == 0)
@@ -135,11 +134,13 @@ public partial class FindPersonsViewModel : ObservableObject
         try
         {
             foreach (var u in selectedUsers)
+            {
                 await _api.AddFriendAsync( CurrentUserId, u.Id, CancellationToken.None );
+                u.IsSelected = false;
+            }
 
             StatusMessage = "Tilføjet til vennelisten.";
 
-            // fjern fra listen med det samme
             foreach (var u in selectedUsers)
                 AllEntries.Remove( u );
 

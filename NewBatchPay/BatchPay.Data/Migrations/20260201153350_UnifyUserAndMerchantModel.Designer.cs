@@ -4,6 +4,7 @@ using BatchPay.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BatchPay.Data.Migrations
 {
     [DbContext(typeof(BatchPayContext))]
-    partial class BatchPayContextModelSnapshot : ModelSnapshot
+    [Migration("20260201153350_UnifyUserAndMerchantModel")]
+    partial class UnifyUserAndMerchantModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,12 +112,17 @@ namespace BatchPay.Data.Migrations
                     b.Property<int>("CreatedByUserId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("DeactivatedAtUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("IconKey")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Message")
                         .HasMaxLength(500)
@@ -129,7 +137,7 @@ namespace BatchPay.Data.Migrations
 
                     b.HasIndex("CreatedByUserId");
 
-                    b.ToTable("GroupPayments", (string)null);
+                    b.ToTable("GroupPayments", "dbo");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.GroupPaymentMemberEntity", b =>
@@ -143,9 +151,6 @@ namespace BatchPay.Data.Migrations
                     b.Property<int>("GroupPaymentId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<int>("MemberId")
                         .HasColumnType("int");
 
@@ -156,7 +161,7 @@ namespace BatchPay.Data.Migrations
                     b.HasIndex("GroupPaymentId", "MemberId")
                         .IsUnique();
 
-                    b.ToTable("GroupPaymentMembers", (string)null);
+                    b.ToTable("GroupPaymentMembers", "dbo");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.MerchantIntegrationEntity", b =>
@@ -165,32 +170,39 @@ namespace BatchPay.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AllowedOrigin")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("ApiKeyHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("DefaultReturnUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("SigningSecretHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("UpdatedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("WebhookUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("MerchantId");
 
-                    b.ToTable("MerchantIntegrations", (string)null);
+                    b.ToTable("MerchantIntegrations", "dbo");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.MerchantEntity", b =>

@@ -38,9 +38,10 @@ builder.Services.AddDbContext<BatchPayContext>( opt =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IGroupPaymentService, GroupPaymentService>();
-
+builder.Services.AddScoped<IDirectoryService, DirectoryService>();
 // Seed
 builder.Services.AddScoped<DatabaseSeeder>();
+
 
 var app = builder.Build();
 

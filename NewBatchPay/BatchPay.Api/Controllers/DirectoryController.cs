@@ -1,40 +1,23 @@
-using BatchPay.Contracts.Dto;
-using BatchPay.Data;
+using BatchPay.Logic.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BatchPay.Api.Controllers;
 
 [ApiController]
-[Route( "api/directory" )]
-public sealed class DirectoryController( BatchPayContext db ) : ControllerBase
+[Route("api/[controller]")]
+public class DirectoryController : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<DirectoryEntryDto>>> GetAll( CancellationToken ct )
+    private readonly IDirectoryService _directoryService;
+
+    public DirectoryController(IDirectoryService directoryService)
     {
-        var users = await db.Users
-            .Select( u => new DirectoryEntryDto(
-                DirectoryEntryType.User,
-                u.Id,
-                u.DisplayName,
-                u.Handle,
-                null,
-                null
-            ) )
-            .ToListAsync( ct );
+        _directoryService = directoryService;
+    }
 
-        var merchants = await db.Merchants
-            .Where( m => m.IsActive )
-            .Select( m => new DirectoryEntryDto(
-                DirectoryEntryType.Merchant,
-                m.Id,
-                m.DisplayName,
-                m.Handle,
-                m.City,
-                m.LogoUrl
-            ) )
-            .ToListAsync( ct );
-
-        return Ok( users.Concat( merchants ).ToList() );
+    [HttpGet]
+    public async Task<IActionResult> GetDirectory(CancellationToken ct)
+    {
+        var entries = await _directoryService.GetDirectoryAsync(ct);
+        return Ok(entries);
     }
 }

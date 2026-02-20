@@ -9,36 +9,50 @@ public sealed class FriendService( BatchPayContext db ) : IFriendService
 {
     private const byte Accepted = 1;
 
-    public async Task<IReadOnlyList<UserDto>> GetFriendsAsync( int requesterUserId, CancellationToken ct )
+    public async Task<IReadOnlyList<UserDto>> GetFriendsAsync( int requesterId, CancellationToken ct )
     {
-        // Venner = Requester -> Receiver
+        // This method is already correct.
         return await db.FriendRequests
-    .Where( fr => fr.RequesterUserId == requesterUserId && fr.Status == Accepted )
-    .Join( db.Users, fr => fr.ReceiverUserId, u => u.Id, ( fr, u ) => u )
-    .OrderBy( u => u.DisplayName )
-    .Select( u => new UserDto( u.Id, u.DisplayName, u.Handle ) )
-    .ToListAsync( ct );
+            .Where( fr => fr.RequesterId == requesterId && fr.Status == Accepted )
+            .Select( fr => fr.Receiver ) // Select the related DirectoryEntry (User or Merchant)
+            .OrderBy( e => e.DisplayName )
+            .Select( e => new UserDto( e.Id, e.DisplayName, e.Handle ) )
+            .ToListAsync( ct );
     }
 
     public async Task<bool> AddFriendAsync( AddFriendRequestDto dto, CancellationToken ct )
     {
-        if (dto.RequesterUserId == dto.ReceiverUserId) return false;
+        // This code is now correct because it matches the updated DTO.
+        if (dto.RequesterId == dto.ReceiverId)
+        {
+            return false;
+        }
 
-        var requesterExists = await db.Users.AnyAsync( x => x.Id == dto.RequesterUserId, ct );
-        var receiverExists = await db.Users.AnyAsync( x => x.Id == dto.ReceiverUserId, ct );
-        if (!requesterExists || !receiverExists) return false;
+        // Check if both the requester and receiver exist in the directory.
+        var requesterExists = await db.DirectoryEntries.AnyAsync( e => e.Id == dto.RequesterId, ct );
+        var receiverExists = await db.DirectoryEntries.AnyAsync( e => e.Id == dto.ReceiverId, ct );
 
-        var exists = await db.FriendRequests.AnyAsync( x =>
-            x.RequesterUserId == dto.RequesterUserId &&
-            x.ReceiverUserId == dto.ReceiverUserId, ct );
+        if (!requesterExists || !receiverExists)
+        {
+            return false;
+        }
 
-        if (exists) return true; // idempotent
+        // Check if a friend request already exists.
+        var exists = await db.FriendRequests.AnyAsync( fr =>
+            fr.RequesterId == dto.RequesterId &&
+            fr.ReceiverId == dto.ReceiverId, ct );
+
+        if (exists)
+        {
+            return true; // Idempotent
+        }
 
         db.FriendRequests.Add( new FriendRequestEntity
         {
-            RequesterUserId = dto.RequesterUserId,
-            ReceiverUserId = dto.ReceiverUserId,
-            Status = Accepted
+            RequesterId = dto.RequesterId,
+            ReceiverId = dto.ReceiverId,
+            Status = Accepted,
+            CreatedAt = DateTime.UtcNow
         } );
 
         await db.SaveChangesAsync( ct );

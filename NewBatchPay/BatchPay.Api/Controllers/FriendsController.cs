@@ -5,14 +5,27 @@ using Microsoft.AspNetCore.Mvc;
 namespace BatchPay.Api.Controllers;
 
 [ApiController]
-[Route( "api/friends" )]
-public sealed class FriendsController( IFriendService friends ) : ControllerBase
+[Route("api/[controller]")]
+public class FriendsController : ControllerBase
 {
-    [HttpGet( "{requesterUserId:int}" )]
-    public async Task<IActionResult> GetFriends( int requesterUserId, CancellationToken ct )
-        => Ok( await friends.GetFriendsAsync( requesterUserId, ct ) );
+    private readonly IFriendService _friendService;
+
+    public FriendsController(IFriendService friendService)
+    {
+        _friendService = friendService;
+    }
+
+    [HttpGet("{requesterId:int}")]
+    public async Task<IReadOnlyList<UserDto>> GetFriends(int requesterId, CancellationToken ct)
+    {
+        return await _friendService.GetFriendsAsync(requesterId, ct);
+    }
 
     [HttpPost]
-    public async Task<IActionResult> AddFriend( [FromBody] AddFriendRequestDto dto, CancellationToken ct )
-        => (await friends.AddFriendAsync( dto, ct )) ? Ok() : BadRequest();
+    public async Task<IActionResult> AddFriend([FromBody] AddFriendRequestDto dto, CancellationToken ct)
+    {
+        // The DTO is now simpler: (int RequesterId, int ReceiverId)
+        var success = await _friendService.AddFriendAsync(dto, ct);
+        return success ? Ok() : BadRequest("Failed to add friend.");
+    }
 }
