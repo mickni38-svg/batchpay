@@ -11,3 +11,17 @@
 /Data/obj
 /Data/bin/Debug/net8.0
 /BatchPayLogic
+/BatchPay/.vs/ProjectEvaluation
+/NewBatchPay/BatchPay/bin/Debug
+/NewBatchPay/BatchPay.Contracts/bin/Debug/net10.0
+/NewBatchPay/BatchPay.Contracts/obj
+/NewBatchPay/BatchPay.Data/bin/Debug/net10.0
+/NewBatchPay/BatchPay.Data/obj
+/NewBatchPay/BatchPay.Logic/bin/Debug/net10.0
+/NewBatchPay/BatchPay.Logic/obj
+/NewBatchPay/.vs
+/NewBatchPay/BatchPay.Api/bin/Debug/net10.0
+/NewBatchPay/BatchPay.Api/obj
+/NewBatchPay/BatchPay.Frontend/.vs
+/NewBatchPay/BatchPay.Frontend/bin/Debug
+/NewBatchPay/BatchPay.Frontend/obj
