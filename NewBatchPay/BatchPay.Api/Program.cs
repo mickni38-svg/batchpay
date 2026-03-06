@@ -39,6 +39,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IGroupPaymentService, GroupPaymentService>();
 builder.Services.AddScoped<IDirectoryService, DirectoryService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
 // Seed
 builder.Services.AddScoped<DatabaseSeeder>();
 

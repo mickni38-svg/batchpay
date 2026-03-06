@@ -17,7 +17,7 @@ namespace BatchPay.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -116,6 +116,9 @@ namespace BatchPay.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MerchantId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Message")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -128,6 +131,8 @@ namespace BatchPay.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("MerchantId");
 
                     b.ToTable("GroupPayments", (string)null);
                 });
@@ -191,6 +196,110 @@ namespace BatchPay.Data.Migrations
                     b.HasKey("MerchantId");
 
                     b.ToTable("MerchantIntegrations", (string)null);
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.NotificationEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(600)
+                        .HasColumnType("nvarchar(600)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GroupPaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LinkUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("ToUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToUserId", "CreatedAtUtc");
+
+                    b.ToTable("Notifications", (string)null);
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.OrderEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GroupPaymentMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MerchantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MerchantLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupPaymentMemberId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.OrderLineEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderLines");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.MerchantEntity", b =>
@@ -278,7 +387,15 @@ namespace BatchPay.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BatchPay.Data.Entities.MerchantEntity", "Merchant")
+                        .WithMany()
+                        .HasForeignKey("MerchantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Merchant");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.GroupPaymentMemberEntity", b =>
@@ -311,9 +428,50 @@ namespace BatchPay.Data.Migrations
                     b.Navigation("Merchant");
                 });
 
+            modelBuilder.Entity("BatchPay.Data.Entities.NotificationEntity", b =>
+                {
+                    b.HasOne("BatchPay.Data.Entities.DirectoryEntryEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.OrderEntity", b =>
+                {
+                    b.HasOne("BatchPay.Data.Entities.GroupPaymentMemberEntity", "GroupPaymentMember")
+                        .WithMany("Orders")
+                        .HasForeignKey("GroupPaymentMemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroupPaymentMember");
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.OrderLineEntity", b =>
+                {
+                    b.HasOne("BatchPay.Data.Entities.OrderEntity", "Order")
+                        .WithMany("Lines")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("BatchPay.Data.Entities.GroupPaymentEntity", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.GroupPaymentMemberEntity", b =>
+                {
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.OrderEntity", b =>
+                {
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.MerchantEntity", b =>

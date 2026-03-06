@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using BatchPay.Contracts.Dto;
+﻿using BatchPay.Contracts.Dto;
 using BatchPay.Frontend.Models;
 using BatchPay.Frontend.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 
 namespace BatchPay.Frontend.ViewModels;
 
@@ -15,8 +11,9 @@ public partial class FindPersonsViewModel : ObservableObject
 {
     private readonly BatchPayApiClient _api;
 
-    // TODO: senere skal dette komme fra login/session
-    public int CurrentUserId { get; } = 1;
+    private readonly IUserContext _userContext;
+
+    private int CurrentUserId => _userContext.CurrentUserId ?? 0;
 
     // ✅ UI-liste (Users + Merchants) som kan markeres (kun users)
     public ObservableCollection<SelectableDirectoryEntry> AllEntries { get; } = new();
@@ -33,9 +30,10 @@ public partial class FindPersonsViewModel : ObservableObject
 
     public bool HasSelection => AllEntries.Any( x => x.IsSelected );
 
-    public FindPersonsViewModel( BatchPayApiClient api )
+    public FindPersonsViewModel( BatchPayApiClient api, IUserContext userContext )
     {
         _api = api;
+        _userContext = userContext;
     }
 
     [RelayCommand]

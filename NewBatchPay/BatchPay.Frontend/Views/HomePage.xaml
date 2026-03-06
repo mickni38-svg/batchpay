@@ -3,6 +3,8 @@
     x:Class="BatchPay.Frontend.Views.HomePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:BatchPay.Frontend.ViewModels"
+    x:DataType="vm:HomeViewModel"
     BackgroundColor="#000000"
     Padding="0">
 
@@ -16,7 +18,7 @@
 
         <!-- Content -->
         <Grid Padding="16,16"
-              RowDefinitions="*,Auto,Auto"
+              RowDefinitions="*,Auto,Auto,Auto"
               RowSpacing="14">
 
             <Grid Grid.Row="0"
@@ -29,7 +31,6 @@
                 <!-- ===================== OVERBLIK ===================== -->
                 <Grid Grid.Row="0" Grid.Column="0" HeightRequest="140">
 
-                    <!-- Neon outline -->
                     <Border StrokeThickness="2"
                             StrokeShape="RoundRectangle 22"
                             Padding="0"
@@ -42,7 +43,6 @@
                         </Border.Stroke>
                     </Border>
 
-                    <!-- Card -->
                     <Border Stroke="#2A313B"
                             StrokeThickness="1.6"
                             Background="#0B0B0D"
@@ -69,7 +69,6 @@
                                        VerticalOptions="Center" />
                             </Border>
 
-                            <!-- ✅ Label under ikon -->
                             <Label Text="Overblik"
                                    TextColor="#EDEDED"
                                    FontSize="14"
@@ -231,8 +230,21 @@
 
             </Grid>
 
-            <!-- Log ind -->
-            <Button Grid.Row="1"
+            <!-- ✅ Login dropdown -->
+            <Border Grid.Row="1"
+                    Stroke="#2A313B"
+                    StrokeThickness="1.6"
+                    Background="#0B0B0D"
+                    StrokeShape="RoundRectangle 20"
+                    Padding="12">
+                <Picker Title="Vælg bruger"
+                        ItemsSource="{Binding Users}"
+                        ItemDisplayBinding="{Binding DisplayName}"
+                        SelectedItem="{Binding SelectedUser}" />
+            </Border>
+
+            <!-- ✅ Log ind (binder til VM command) -->
+            <Button Grid.Row="2"
                     Text="Log ind"
                     HeightRequest="54"
                     CornerRadius="20"
@@ -242,18 +254,30 @@
                     TextColor="#EDEDED"
                     FontSize="15"
                     FontAttributes="Bold"
-                    Clicked="OnLoginClicked" />
+                    Command="{Binding LoginCommand}" />
 
-            <!-- Opret dig -->
-            <Label Grid.Row="2"
-                   Text="Opret dig som bruger"
-                   TextColor="#2FAE7B"
-                   FontSize="13"
-                   HorizontalTextAlignment="Center">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnSignupTapped" />
-                </Label.GestureRecognizers>
-            </Label>
+            <!-- Opret dig / Log ud -->
+            <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Label Grid.Column="0"
+                       Text="Opret dig som bruger"
+                       TextColor="#2FAE7B"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSignupTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+                <Label Grid.Column="1"
+                       Text="Log ud"
+                       TextColor="#F2994A"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
 
         </Grid>
     </Grid>

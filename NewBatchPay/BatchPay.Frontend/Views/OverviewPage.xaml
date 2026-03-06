@@ -6,279 +6,193 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:BatchPay.Frontend.ViewModels"
     x:DataType="vm:OverviewViewModel"
-    BackgroundColor="#000000"
-    Padding="10,8">
+    BackgroundColor="#0B0B0C"
+    Padding="16">
 
-    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
 
-        <!-- TOP: Tabs/chips + Besked -->
-        <VerticalStackLayout Grid.Row="0" Spacing="10">
+        <!-- TOP: Segment bar -->
+        <VerticalStackLayout Grid.Row="0" Spacing="12">
+            <Grid>
+                <Frame CornerRadius="18" BackgroundColor="#121214" HasShadow="False" Padding="0" />
+                <Frame CornerRadius="18" BackgroundColor="#161619" HasShadow="False" Padding="8" Margin="1">
+                    <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                        <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Tabs}" Spacing="0">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="vm:GroupPaymentTabVm">
+                                    <Grid ColumnDefinitions="Auto,Auto" VerticalOptions="Center">
+                                        <Grid Padding="6,0" VerticalOptions="Center">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding BindingContext.SelectGroupPaymentCommand, Source={x:Reference RootPage}}"
+                                                    CommandParameter="{Binding .}" />
+                                            </Grid.GestureRecognizers>
 
-            <!-- Tabs/chips -->
-            <Frame
-                BackgroundColor="#0B0B0D"
-                BorderColor="#1A1D22"
-                CornerRadius="14"
-                HasShadow="False"
-                Padding="10"
-                Margin="0,0,0,0">
+                                            <Frame CornerRadius="14" BackgroundColor="#1A2A25" HasShadow="False" Padding="0" HeightRequest="36"
+                                                   IsVisible="{Binding IsSelected}" />
 
-                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
-                    <HorizontalStackLayout
-                        BindableLayout.ItemsSource="{Binding Tabs}"
-                        Spacing="0">
+                                            <HorizontalStackLayout x:Name="TabContent" Spacing="8" Padding="14,10" VerticalOptions="Center">
 
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="vm:GroupPaymentTabVm">
+                                                <Image x:Name="TabIcon"
+                                                       Source="{Binding IconSource}"
+                                                       WidthRequest="16"
+                                                       HeightRequest="16"
+                                                       Opacity="0.85"
+                                                       VerticalOptions="Center" />
 
-                                <Grid ColumnDefinitions="Auto,Auto"
-                                      VerticalOptions="Center">
+                                                <!-- Tekstblok (2 linjer) -->
+                                                <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                                                    <Label x:Name="TabText"
+                                                           Text="{Binding Title}"
+                                                           FontSize="13"
+                                                           TextColor="#B8B8B8"
+                                                           LineBreakMode="TailTruncation" />
 
-                                    <Grid Padding="6,0"
-                                          VerticalOptions="Center">
+                                                    <Label x:Name="TabText2"
+                                                           Text="{Binding MerchantDisplayName}"
+                                                           FontSize="11"
+                                                           TextColor="#8C8C8F"
+                                                           LineBreakMode="TailTruncation" />
+                                                </VerticalStackLayout>
 
-                                        <Grid.GestureRecognizers>
-                                            <TapGestureRecognizer
-                                                Command="{Binding BindingContext.SelectGroupPaymentCommand, Source={x:Reference RootPage}}"
-                                                CommandParameter="{Binding .}" />
-                                        </Grid.GestureRecognizers>
+                                                <Label x:Name="TabDelete"
+                                                       Text="🗑"
+                                                       FontSize="13"
+                                                       TextColor="#8C8C8F"
+                                                       Opacity="0.7"
+                                                       VerticalOptions="Center"
+                                                       Margin="6,0,0,0">
+                                                    <Label.GestureRecognizers>
+                                                        <TapGestureRecognizer
+                                                            Command="{Binding BindingContext.DeleteGroupPaymentCommand, Source={x:Reference RootPage}}"
+                                                            CommandParameter="{Binding .}" />
+                                                    </Label.GestureRecognizers>
+                                                </Label>
 
-                                        <Frame CornerRadius="14"
-                                               BackgroundColor="#0E1116"
-                                               HasShadow="False"
-                                               Padding="0"
-                                               HeightRequest="36"
-                                               BorderColor="#2FAE7B"
-                                               IsVisible="{Binding IsSelected}" />
+                                            </HorizontalStackLayout>
 
-                                        <HorizontalStackLayout
-                                            Spacing="8"
-                                            Padding="10,0"
-                                            HeightRequest="36"
-                                            VerticalOptions="Center">
+                                            <BoxView HeightRequest="6" BackgroundColor="#3D6B57" Opacity="0.25" VerticalOptions="End" Margin="18,0,18,0"
+                                                     IsVisible="{Binding IsSelected}" />
+                                            <BoxView HeightRequest="2" BackgroundColor="#3D6B57" VerticalOptions="End" Margin="18,0,18,2"
+                                                     IsVisible="{Binding IsSelected}" />
+                                        </Grid>
 
-                                            <HorizontalStackLayout.Triggers>
-                                                <DataTrigger TargetType="HorizontalStackLayout"
-                                                             Binding="{Binding IsSelected}"
-                                                             Value="True">
-                                                    <Setter TargetName="TabText" Property="Label.TextColor" Value="#EDEDED" />
-                                                    <Setter TargetName="TabText" Property="Label.FontAttributes" Value="Bold" />
-                                                    <Setter TargetName="TabIcon" Property="Image.Opacity" Value="1" />
-                                                    <Setter TargetName="TabDelete" Property="Label.TextColor" Value="#D46A6A" />
-                                                    <Setter TargetName="TabDelete" Property="Label.Opacity" Value="1" />
-                                                </DataTrigger>
-
-                                                <DataTrigger TargetType="HorizontalStackLayout"
-                                                             Binding="{Binding IsSelected}"
-                                                             Value="False">
-                                                    <Setter TargetName="TabText" Property="Label.TextColor" Value="#B8B8B8" />
-                                                    <Setter TargetName="TabText" Property="Label.FontAttributes" Value="None" />
-                                                    <Setter TargetName="TabIcon" Property="Image.Opacity" Value="0.85" />
-                                                    <Setter TargetName="TabDelete" Property="Label.TextColor" Value="#8C8C8F" />
-                                                    <Setter TargetName="TabDelete" Property="Label.Opacity" Value="0.7" />
-                                                </DataTrigger>
-                                            </HorizontalStackLayout.Triggers>
-
-                                            <Image x:Name="TabIcon"
-                                                   Source="{Binding IconSource}"
-                                                   WidthRequest="16"
-                                                   HeightRequest="16"
-                                                   Opacity="0.85"
-                                                   VerticalOptions="Center" />
-
-                                            <Label x:Name="TabText"
-                                                   Text="{Binding Title}"
-                                                   FontSize="13"
-                                                   TextColor="#B8B8B8"
-                                                   VerticalOptions="Center"
-                                                   LineBreakMode="TailTruncation"
-                                                   MaxLines="1" />
-
-                                            <Label x:Name="TabDelete"
-                                                   Text="🗑"
-                                                   FontSize="14"
-                                                   Opacity="0.7"
-                                                   VerticalOptions="Center"
-                                                   Margin="6,0,0,0">
-                                                <Label.GestureRecognizers>
-                                                    <TapGestureRecognizer
-                                                        Command="{Binding BindingContext.DeleteGroupPaymentCommand, Source={x:Reference RootPage}}"
-                                                        CommandParameter="{Binding .}" />
-                                                </Label.GestureRecognizers>
-                                            </Label>
-
-                                        </HorizontalStackLayout>
+                                        <BoxView Grid.Column="1" WidthRequest="1" HeightRequest="16" VerticalOptions="Center"
+                                                 BackgroundColor="#242426" Opacity="0.7" IsVisible="{Binding ShowDivider}" Margin="2,0" />
                                     </Grid>
-
-                                    <BoxView Grid.Column="1"
-                                             WidthRequest="1"
-                                             HeightRequest="16"
-                                             BackgroundColor="#1A1D22"
-                                             VerticalOptions="Center"
-                                             Margin="6,0"
-                                             IsVisible="{Binding ShowDivider}" />
-                                </Grid>
-
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </HorizontalStackLayout>
-                </ScrollView>
-            </Frame>
-
-            <!-- Besked (vises for valgt gruppebetaling) -->
-            <Frame
-                BackgroundColor="#0B0B0D"
-                BorderColor="#1A1D22"
-                CornerRadius="14"
-                HasShadow="False"
-                Padding="10"
-                Margin="0,0,0,12">
-
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Besked"
-                           TextColor="#BDBDBD"
-                           FontSize="12" />
-
-                    <Label Text="{Binding SelectedMessage}"
-                           TextColor="#EDEDED"
-                           FontSize="13"
-                           LineBreakMode="WordWrap"
-                           IsVisible="{Binding HasSelectedMessage}" />
-
-                    <Label Text="Ingen besked"
-                           TextColor="#6F6F73"
-                           FontSize="13"
-                           IsVisible="{Binding HasNoSelectedMessage}" />
-                </VerticalStackLayout>
-            </Frame>
-
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </ScrollView>
+                </Frame>
+            </Grid>
         </VerticalStackLayout>
 
-        <!-- Members -->
-        <Frame Grid.Row="1"
-               BackgroundColor="#0B0B0D"
-               BorderColor="#1A1D22"
-               CornerRadius="14"
-               HasShadow="False"
-               Padding="0">
-
-            <CollectionView ItemsSource="{Binding MemberAccordions}"
-                            SelectionMode="None"
-                            BackgroundColor="#0B0B0D">
-
+        <!-- LISTE: Personer + accordion -->
+        <Frame Grid.Row="1" CornerRadius="20" BackgroundColor="#101012" HasShadow="False" Padding="1">
+            <CollectionView ItemsSource="{Binding MemberAccordions}">
                 <CollectionView.EmptyView>
-                    <Label Text="Ingen deltagere"
-                           TextColor="#7B7B7D"
-                           HorizontalTextAlignment="Center"
-                           Margin="0,18,0,18" />
+                    <Label Text="Ingen deltagere" TextColor="#7B7B7D" HorizontalOptions="Center" VerticalOptions="Center" Margin="0,20" />
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="vm:GroupPaymentMemberVm">
+                        <Frame CornerRadius="16" BackgroundColor="#151517" HasShadow="False" Padding="12" Margin="0,0,0,10">
+                            <Frame.Triggers>
+                                <DataTrigger TargetType="Frame" Binding="{Binding IsMerchant}" Value="True">
+                                    <Setter Property="IsVisible" Value="False" />
+                                </DataTrigger>
+                            </Frame.Triggers>
 
-                        <Grid RowDefinitions="Auto,Auto,Auto,Auto"
-                              ColumnDefinitions="40,*,Auto"
-                              ColumnSpacing="10"
-                              Padding="10,10">
+                            <VerticalStackLayout Spacing="10">
 
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ToggleCommand}" />
-                            </Grid.GestureRecognizers>
+                                <Grid ColumnDefinitions="44,*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="10">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ToggleCommand}" />
+                                    </Grid.GestureRecognizers>
 
-                            <Frame Grid.Column="0"
-                                   Grid.RowSpan="2"
-                                   WidthRequest="34"
-                                   HeightRequest="34"
-                                   CornerRadius="17"
-                                   BackgroundColor="{Binding AvatarColor}"
-                                   HasShadow="False"
-                                   VerticalOptions="Center"
-                                   Padding="0">
-                                <Label Text="{Binding Initials}"
-                                       TextColor="White"
-                                       FontAttributes="Bold"
-                                       FontSize="11"
-                                       HorizontalTextAlignment="Center"
-                                       VerticalTextAlignment="Center"
-                                       HorizontalOptions="Fill"
-                                       VerticalOptions="Fill" />
-                            </Frame>
+                                    <Frame WidthRequest="36" HeightRequest="36" CornerRadius="18"
+                                           BackgroundColor="{Binding AvatarColor}" HasShadow="False" VerticalOptions="Center" Padding="0">
+                                        <Label Text="{Binding Initials}" TextColor="White" FontAttributes="Bold" FontSize="12"
+                                               HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="Fill" VerticalOptions="Fill" />
+                                    </Frame>
 
-                            <Label Grid.Column="1"
-                                   Text="{Binding User.DisplayName}"
-                                   TextColor="#EDEDED"
-                                   FontSize="14"
-                                   LineBreakMode="TailTruncation"
-                                   VerticalOptions="End" />
+                                    <Label Grid.Column="1" Text="{Binding DisplayName}" TextColor="White" FontSize="14" FontAttributes="Bold">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsExpanded}" Value="True">
+                                                <Setter Property="TextColor" Value="#A7D6C6" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
 
-                            <Label Grid.Column="1"
-                                   Grid.Row="1"
-                                   Text="{Binding User.Handle, StringFormat='@{0}'}"
-                                   TextColor="#9AA0A6"
-                                   FontSize="11"
-                                   LineBreakMode="TailTruncation"
-                                   VerticalOptions="Start" />
+                                    <!-- FIX: User.Handle findes ikke -> vis Id i stedet -->
+                                    <Label Grid.Column="1" Grid.Row="1"
+                                           Text="{Binding UserId, StringFormat='Id: {0}'}"
+                                           TextColor="#9A9A9A" FontSize="12" />
 
-                            <HorizontalStackLayout Grid.Column="2"
-                                                   Grid.RowSpan="2"
-                                                   Spacing="10"
-                                                   VerticalOptions="Center">
-                                <Label Text="afventer"
-                                       TextColor="#9AA0A6"
-                                       FontSize="11"
-                                       VerticalOptions="Center" />
+                                    <HorizontalStackLayout Grid.Column="2" Grid.RowSpan="2" Spacing="10" VerticalOptions="Center">
+                                        <Label Text="{Binding PaymentStatusText}" TextColor="#9A9A9A" FontSize="12" VerticalOptions="Center" />
+                                        <Label Text="›" TextColor="#B0B0B0" FontSize="20" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsExpanded}" Value="True">
+                                                    <Setter Property="Rotation" Value="90" />
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsExpanded}" Value="False">
+                                                    <Setter Property="Rotation" Value="0" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </HorizontalStackLayout>
+                                </Grid>
 
-                                <Label Text="›"
-                                       TextColor="#B0B0B0"
-                                       FontSize="20"
-                                       VerticalOptions="Center">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label"
-                                                     Binding="{Binding IsExpanded}"
-                                                     Value="True">
-                                            <Setter Property="Rotation" Value="90" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Label"
-                                                     Binding="{Binding IsExpanded}"
-                                                     Value="False">
-                                            <Setter Property="Rotation" Value="0" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </HorizontalStackLayout>
+                                <!-- Accordion: Order details -->
+                                <Grid IsVisible="{Binding IsExpanded}" Padding="6,2,6,0">
+                                    <Frame CornerRadius="14" BackgroundColor="#0E1111" HasShadow="False" BorderColor="#222225" Padding="10">
+                                        <VerticalStackLayout Spacing="10">
 
-                            <Grid Grid.Row="2"
-                                  Grid.ColumnSpan="3"
-                                  IsVisible="{Binding IsExpanded}"
-                                  Padding="36,6,0,0">
-                                <Label Text="(detaljer kommer senere)"
-                                       TextColor="#7B7B7D"
-                                       FontSize="12" />
-                            </Grid>
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Label Text="Ordre" TextColor="#BDBDBD" FontSize="12" />
+                                                <Label Text="{Binding OrderTitle}" TextColor="#EDEDED" FontSize="12"
+                                                       LineBreakMode="TailTruncation" MaxLines="1" IsVisible="{Binding HasOrder}" />
+                                            </HorizontalStackLayout>
 
-                            <BoxView Grid.Row="3"
-                                     Grid.ColumnSpan="3"
-                                     HeightRequest="1"
-                                     Margin="36,8,0,0"
-                                     BackgroundColor="#1A1D22" />
+                                            <Label Text="Ingen ordre endnu" TextColor="#7B7B7D" FontSize="12"
+                                                   IsVisible="{Binding HasOrder, Converter={StaticResource InverseBoolConverter}}" />
 
-                        </Grid>
+                                            <VerticalStackLayout IsVisible="{Binding HasOrder}"
+                                                                 BindableLayout.ItemsSource="{Binding OrderLines}"
+                                                                 Spacing="6">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:OrderLineVm">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                            <Label Text="{Binding Quantity}" TextColor="#9AA0A6" FontSize="12" VerticalOptions="Center" />
+                                                            <Label Grid.Column="1" Text="{Binding ItemName}" TextColor="#EDEDED" FontSize="12"
+                                                                   LineBreakMode="TailTruncation" VerticalOptions="Center" />
+                                                            <Label Grid.Column="2" Text="{Binding UnitPriceText}" TextColor="#9AA0A6" FontSize="12"
+                                                                   HorizontalTextAlignment="End" VerticalOptions="Center" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </VerticalStackLayout>
 
+                                            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding HasOrder}">
+                                                <Label Text="Total" TextColor="#BDBDBD" FontSize="12" />
+                                                <Label Grid.Column="1" Text="{Binding OrderTotalText}" TextColor="#EDEDED" FontSize="12"
+                                                       HorizontalTextAlignment="End" />
+                                            </Grid>
+
+                                        </VerticalStackLayout>
+                                    </Frame>
+                                </Grid>
+
+                            </VerticalStackLayout>
+                        </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Frame>
 
-        <!-- PAY -->
-        <Button Grid.Row="2"
-                Text="Betal ordre"
-                BackgroundColor="#0B0B0D"
-                TextColor="#EDEDED"
-                BorderColor="#1A1D22"
-                CornerRadius="16"
-                HeightRequest="42"
-                FontSize="13"
-                Margin="0,10,0,0"
-                Command="{Binding PayOrderCommand}" />
+        <Button Grid.Row="2" Text="Betal ordre" BackgroundColor="#24322C" TextColor="White"
+                CornerRadius="20" HeightRequest="52" Command="{Binding PayOrderCommand}" />
     </Grid>
 </ContentPage>

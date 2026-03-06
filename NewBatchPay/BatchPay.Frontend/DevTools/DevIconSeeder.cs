@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Xml.Linq;
 
 namespace BatchPay.Frontend.DevTools;
 
@@ -20,6 +21,7 @@ public static class DevIconSeeder
         };
 
         var bodies = GetBodies();
+        var addedFiles = new List<string>();
 
         foreach (var key in keys)
         {
@@ -33,8 +35,69 @@ public static class DevIconSeeder
                 body = @"<circle cx=""12"" cy=""12"" r=""9""/><path d=""M12 8v8""/><path d=""M8 12h8""/>";
 
             File.WriteAllText( fullPath, Svg( body ), new UTF8Encoding( encoderShouldEmitUTF8Identifier: false ) );
+            addedFiles.Add(fileName);
+        }
+
+        if (addedFiles.Any())
+        {
+            UpdateProjectFile(addedFiles);
         }
     }
+
+    private static void UpdateProjectFile(IEnumerable<string> addedFiles)
+    {
+        var projectDir = FindProjectDirectory();
+        if (projectDir is null) return;
+
+        var csprojPath = Path.Combine(projectDir.FullName, "BatchPay.Frontend.csproj");
+        if (!File.Exists(csprojPath)) return;
+
+        var doc = XDocument.Load(csprojPath);
+        var ns = doc.Root?.GetDefaultNamespace() ?? XNamespace.None;
+
+        var itemGroup = doc.Root?.Elements(ns + "ItemGroup")
+            .FirstOrDefault(ig => ig.Elements(ns + "MauiImage").Any());
+
+        if (itemGroup is null)
+        {
+            itemGroup = new XElement(ns + "ItemGroup");
+            doc.Root?.Add(itemGroup);
+        }
+
+        var existingImages = new HashSet<string>(
+            itemGroup.Elements(ns + "MauiImage")
+                     .Select(e => e.Attribute("Include")?.Value ?? "")
+                     .Where(s => !string.IsNullOrEmpty(s))
+        );
+
+        foreach (var file in addedFiles)
+        {
+            var includePath = $@"Resources\Images\{file}";
+            if (!existingImages.Contains(includePath))
+            {
+                itemGroup.Add(new XElement(ns + "MauiImage",
+                    new XAttribute("Include", includePath)
+                ));
+            }
+        }
+
+        doc.Save(csprojPath);
+    }
+
+    private static DirectoryInfo? FindProjectDirectory()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        for (var i = 0; i < 25 && dir is not null; i++)
+        {
+            if (dir.GetFiles("BatchPay.Frontend.csproj").Any())
+            {
+                return dir;
+            }
+            dir = dir.Parent;
+        }
+        return null;
+    }
+
 
     /// <summary>
     /// Finder ...\BatchPay.Frontend\Resources\Images ved at gå opad og lede efter .sln eller csproj.

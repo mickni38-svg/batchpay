@@ -7,6 +7,9 @@ namespace BatchPay.Frontend.Models;
 
 public class SelectableDirectoryEntry : ObservableObject
 {
+    public string IconFileName { get; init; }
+
+    public ImageSource IconImage => ImageSource.FromFile( IconFileName );
     public DirectoryEntryType Type { get; }
     public int Id { get; }
 
@@ -29,7 +32,7 @@ public class SelectableDirectoryEntry : ObservableObject
     public bool IsSelected
     {
         get => _isSelected;
-        set => SetProperty(ref _isSelected, value);
+        set => SetProperty( ref _isSelected, value );
     }
 
     public string Initials { get; }
@@ -43,6 +46,8 @@ public class SelectableDirectoryEntry : ObservableObject
         Handle = dto.Handle;
         Subtitle = dto.Subtitle;
         LogoUrl = dto.LogoUrl;
+
+        IconFileName = IsMerchant ? "icon_store.png" : "icon_user.png";
 
         Initials = BuildInitials( DisplayName );
         AvatarColor = IsMerchant ? "#1C2B22" : StableAvatarColor( Id, Handle );

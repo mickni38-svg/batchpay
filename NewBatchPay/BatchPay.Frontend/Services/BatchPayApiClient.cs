@@ -5,6 +5,9 @@ namespace BatchPay.Frontend.Services;
 
 public sealed class BatchPayApiClient( HttpClient http )
 {
+    public Task<IReadOnlyList<NotificationDto>> GetNotificationsForUserAsync( int userId, CancellationToken ct )
+    => http.GetFromJsonAsync<IReadOnlyList<NotificationDto>>( $"api/notifications/for-user/{userId}", ct );
+
     public async Task<List<UserDto>> GetAllUsersAsync( CancellationToken ct )
         => await http.GetFromJsonAsync<List<UserDto>>( "/api/users", ct ) ?? new();
 
@@ -24,6 +27,12 @@ public sealed class BatchPayApiClient( HttpClient http )
         return res.IsSuccessStatusCode;
     }
 
+    public async Task<IReadOnlyList<MemberLatestOrderDto>> GetLatestOrdersForGroupPaymentAsync( int groupPaymentId, CancellationToken ct )
+    {
+        return await http.GetFromJsonAsync<List<MemberLatestOrderDto>>(
+            $"api/orders/group/{groupPaymentId}/latest", ct
+        ) ?? new List<MemberLatestOrderDto>();
+    }
     public async Task<GroupPaymentDto> CreateGroupPaymentAsync( CreateGroupPaymentRequestDto dto, CancellationToken ct )
     {
         var res = await http.PostAsJsonAsync( "/api/group-payments", dto, ct );

@@ -28,4 +28,9 @@ public class FriendsController : ControllerBase
         var success = await _friendService.AddFriendAsync(dto, ct);
         return success ? Ok() : BadRequest("Failed to add friend.");
     }
+
+    // GET /api/friends/directory/{requesterId}
+    [HttpGet( "directory/{requesterId:int}" )]
+    public Task<IReadOnlyList<DirectoryEntryDto>> GetFriendsDirectory( int requesterId, CancellationToken ct )
+        => _friendService.GetFriendsDirectoryAsync( requesterId, ct );
 }

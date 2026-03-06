@@ -5,18 +5,17 @@ namespace BatchPay.Data;
 
 public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options ) : DbContext( options )
 {
-    // Unified DbSet for both Users and Merchants
     public DbSet<DirectoryEntryEntity> DirectoryEntries => Set<DirectoryEntryEntity>();
 
-    // Other DbSets
+    public DbSet<NotificationEntity> Notifications => Set<NotificationEntity>();
     public DbSet<FriendRequestEntity> FriendRequests => Set<FriendRequestEntity>();
     public DbSet<GroupPaymentEntity> GroupPayments => Set<GroupPaymentEntity>();
     public DbSet<GroupPaymentMemberEntity> GroupPaymentMembers => Set<GroupPaymentMemberEntity>();
     public DbSet<MerchantIntegrationEntity> MerchantIntegrations => Set<MerchantIntegrationEntity>();
-
+    public DbSet<OrderEntity> Orders => Set<OrderEntity>();
+    public DbSet<OrderLineEntity> OrderLines => Set<OrderLineEntity>();
     protected override void OnModelCreating( ModelBuilder modelBuilder )
     {
-        // 1. TPH Configuration for DirectoryEntry (The Root)
         modelBuilder.Entity<DirectoryEntryEntity>()
             .ToTable( "DirectoryEntries" )
             .HasDiscriminator<string>( "EntryType" )
@@ -32,17 +31,13 @@ public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options )
             e.Property( x => x.IsActive ).HasDefaultValue( true );
         } );
 
-        // 2. Configuration for UserEntity (Derived Type)
         modelBuilder.Entity<UserEntity>( e =>
         {
-            // Adds the 'Email' column to the 'DirectoryEntries' table for User rows
             e.Property( x => x.Email ).HasMaxLength( 200 ).IsRequired();
         } );
 
-        // 3. Configuration for MerchantEntity (Derived Type)
         modelBuilder.Entity<MerchantEntity>( e =>
         {
-            // Adds merchant-specific columns to the 'DirectoryEntries' table for Merchant rows
             e.Property( x => x.Description ).HasMaxLength( 500 );
             e.Property( x => x.WebsiteUrl ).HasMaxLength( 500 );
             e.Property( x => x.ContactEmail ).HasMaxLength( 200 ).IsRequired();
@@ -54,7 +49,6 @@ public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options )
             e.Property( x => x.CountryCode ).HasMaxLength( 2 );
         } );
 
-        // 4. Relationship Configurations
         modelBuilder.Entity<FriendRequestEntity>( e =>
         {
             e.ToTable( "FriendRequests" );
@@ -74,7 +68,6 @@ public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options )
                 .OnDelete( DeleteBehavior.Restrict );
         } );
 
-
         modelBuilder.Entity<GroupPaymentEntity>( e =>
         {
             e.ToTable( "GroupPayments" );
@@ -86,6 +79,12 @@ public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options )
             e.HasOne( x => x.CreatedBy )
                 .WithMany()
                 .HasForeignKey( x => x.CreatedByUserId )
+                .OnDelete( DeleteBehavior.Restrict );
+
+            // ✅ NYT: merchant relation
+            e.HasOne( x => x.Merchant )
+                .WithMany()
+                .HasForeignKey( x => x.MerchantId )
                 .OnDelete( DeleteBehavior.Restrict );
         } );
 
@@ -105,7 +104,6 @@ public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options )
                 .OnDelete( DeleteBehavior.Restrict );
         } );
 
-
         modelBuilder.Entity<MerchantIntegrationEntity>( e =>
         {
             e.ToTable( "MerchantIntegrations" );
@@ -116,5 +114,39 @@ public sealed class BatchPayContext( DbContextOptions<BatchPayContext> options )
                 .HasForeignKey<MerchantIntegrationEntity>( x => x.MerchantId )
                 .OnDelete( DeleteBehavior.Cascade );
         } );
+
+        // ✅ NYT: Notifications
+        modelBuilder.Entity<NotificationEntity>( e =>
+        {
+            e.ToTable( "Notifications" );
+            e.HasKey( x => x.Id );
+
+            e.Property( x => x.Type ).HasMaxLength( 80 ).IsRequired();
+            e.Property( x => x.Title ).HasMaxLength( 150 ).IsRequired();
+            e.Property( x => x.Body ).HasMaxLength( 600 ).IsRequired();
+            e.Property( x => x.LinkUrl ).HasMaxLength( 1000 );
+
+            e.HasIndex( x => new { x.ToUserId, x.CreatedAtUtc } );
+
+            e.HasOne<DirectoryEntryEntity>()
+                .WithMany()
+                .HasForeignKey( x => x.ToUserId )
+                .OnDelete( DeleteBehavior.Restrict );
+        } );
+
+        modelBuilder.Entity<GroupPaymentMemberEntity>()
+    .HasMany( m => m.Orders )
+    .WithOne( o => o.GroupPaymentMember )
+    .HasForeignKey( o => o.GroupPaymentMemberId )
+    .OnDelete( DeleteBehavior.Cascade );
+
+        modelBuilder.Entity<OrderEntity>()
+            .HasMany( o => o.Lines )
+            .WithOne( l => l.Order )
+            .HasForeignKey( l => l.OrderId )
+            .OnDelete( DeleteBehavior.Cascade );
+
+
     }
+
 }

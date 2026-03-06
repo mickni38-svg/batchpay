@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BatchPay.Data.Migrations
 {
     [DbContext(typeof(BatchPayContext))]
-    [Migration("20260201193351_renameProperty")]
-    partial class renameProperty
+    [Migration("20260302180413_AddNotifications")]
+    partial class AddNotifications
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -119,6 +119,9 @@ namespace BatchPay.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MerchantId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Message")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -131,6 +134,8 @@ namespace BatchPay.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("MerchantId");
 
                     b.ToTable("GroupPayments", (string)null);
                 });
@@ -145,6 +150,9 @@ namespace BatchPay.Data.Migrations
 
                     b.Property<int>("GroupPaymentId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<int>("MemberId")
                         .HasColumnType("int");
@@ -191,6 +199,52 @@ namespace BatchPay.Data.Migrations
                     b.HasKey("MerchantId");
 
                     b.ToTable("MerchantIntegrations", (string)null);
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.NotificationEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(600)
+                        .HasColumnType("nvarchar(600)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GroupPaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LinkUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<int>("ToUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToUserId", "CreatedAtUtc");
+
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.MerchantEntity", b =>
@@ -278,7 +332,15 @@ namespace BatchPay.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BatchPay.Data.Entities.MerchantEntity", "Merchant")
+                        .WithMany()
+                        .HasForeignKey("MerchantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Merchant");
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.GroupPaymentMemberEntity", b =>
@@ -309,6 +371,15 @@ namespace BatchPay.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Merchant");
+                });
+
+            modelBuilder.Entity("BatchPay.Data.Entities.NotificationEntity", b =>
+                {
+                    b.HasOne("BatchPay.Data.Entities.DirectoryEntryEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("BatchPay.Data.Entities.GroupPaymentEntity", b =>

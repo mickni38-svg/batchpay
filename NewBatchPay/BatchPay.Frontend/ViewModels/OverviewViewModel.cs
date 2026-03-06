@@ -2,7 +2,6 @@
 using BatchPay.Frontend.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Graphics;
 using System.Collections.ObjectModel;
 
 namespace BatchPay.Frontend.ViewModels;
@@ -11,7 +10,9 @@ public partial class OverviewViewModel : ObservableObject
 {
     private readonly BatchPayApiClient _api;
 
-    public int CurrentUserId { get; } = 1;
+    private readonly IUserContext _userContext;
+
+    private int CurrentUserId => _userContext.CurrentUserId ?? 0;
 
     public ObservableCollection<GroupPaymentTabVm> Tabs { get; } = new();
     public ObservableCollection<GroupPaymentMemberVm> MemberAccordions { get; } = new();
@@ -30,24 +31,17 @@ public partial class OverviewViewModel : ObservableObject
             OnPropertyChanged();
 
             RebuildMembers();
-
-            // Notify "message" bindings
-            OnPropertyChanged( nameof( SelectedMessage ) );
-            OnPropertyChanged( nameof( HasSelectedMessage ) );
-            OnPropertyChanged( nameof( HasNoSelectedMessage ) );
+            _ = LoadOrdersForSelectedAsync(); // ✅ hent orders efter rebuild
         }
     }
-
-    public string SelectedMessage => SelectedGroupPayment?.Message?.Trim() ?? "";
-    public bool HasSelectedMessage => !string.IsNullOrWhiteSpace( SelectedMessage );
-    public bool HasNoSelectedMessage => !HasSelectedMessage;
 
     [ObservableProperty] private bool isBusy;
     [ObservableProperty] private string? statusMessage;
 
-    public OverviewViewModel( BatchPayApiClient api )
+    public OverviewViewModel( BatchPayApiClient api, IUserContext userContext )
     {
         _api = api;
+        _userContext = userContext;
     }
 
     [RelayCommand]
@@ -121,7 +115,6 @@ public partial class OverviewViewModel : ObservableObject
 
             await _api.DeactivateGroupPaymentAsync( tab.Model.Id, CancellationToken.None );
 
-            // Reload så chip forsvinder
             await LoadAsync();
         }
         catch (Exception ex)
@@ -151,75 +144,50 @@ public partial class OverviewViewModel : ObservableObject
         if (members is null || members.Count == 0)
             return;
 
-        foreach (var u in members)
-            MemberAccordions.Add( new GroupPaymentMemberVm( u ) );
+        foreach (var m in members)
+        {
+            //if (m.Type == DirectoryEntryType.Merchant)
+              //  continue;
+
+            // Hvis GroupPaymentMemberVm i dag forventer UserDto,
+            // skal den opdateres til at tage DirectoryEntryDto i stedet.
+            MemberAccordions.Add( new GroupPaymentMemberVm( m ) );
+        }
+    }
+
+    private async Task LoadOrdersForSelectedAsync()
+    {
+        var gp = SelectedGroupPayment;
+        if (gp is null)
+            return;
+
+        try
+        {
+            // Henter seneste ordre pr medlem
+            var latest = await _api.GetLatestOrdersForGroupPaymentAsync( gp.Id, CancellationToken.None );
+
+            // map key = memberId/userId
+            var map = latest.ToDictionary( x => x.MemberId, x => x.LatestOrder );
+
+            // apply til hver member-vm
+            foreach (var m in MemberAccordions)
+            {
+                if (m.IsMerchant)
+                    continue;
+
+                map.TryGetValue( m.UserId, out var order );
+                    m.ApplyLatestOrder( order );
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = ex.Message;
+        }
     }
 
     private void ClearMembers()
     {
         SelectedGroupPayment = null;
         MemberAccordions.Clear();
-    }
-}
-
-public partial class GroupPaymentTabVm : ObservableObject
-{
-    public GroupPaymentDto Model { get; }
-
-    public string Title => Model.Title;
-
-    // Mapper IconKey -> MAUI asset filename (uden .svg er mest stabilt)
-    public string IconSource => $"icon_{Model.IconKey}";
-
-    [ObservableProperty] private bool isSelected;
-    [ObservableProperty] private bool showDivider = true;
-
-    public GroupPaymentTabVm( GroupPaymentDto model )
-    {
-        Model = model;
-    }
-}
-
-public partial class GroupPaymentMemberVm : ObservableObject
-{
-    public UserDto User { get; }
-    public string Initials { get; }
-    public Color AvatarColor { get; }
-
-    [ObservableProperty] private bool isExpanded;
-
-    public GroupPaymentMemberVm( UserDto user )
-    {
-        User = user;
-
-        Initials = CreateInitials( user.DisplayName );
-        AvatarColor = CreateAvatarColor( user.Id );
-    }
-
-    [RelayCommand]
-    private void Toggle()
-    {
-        IsExpanded = !IsExpanded;
-    }
-
-    private static string CreateInitials( string displayName )
-    {
-        var parts = (displayName ?? "").Trim().Split( ' ', StringSplitOptions.RemoveEmptyEntries );
-
-        if (parts.Length == 0) return "?";
-        if (parts.Length == 1)
-            return parts[ 0 ].Substring( 0, Math.Min( 2, parts[ 0 ].Length ) ).ToUpperInvariant();
-
-        var first = parts[ 0 ].Substring( 0, 1 );
-        var last = parts[ ^1 ].Substring( 0, 1 );
-        return (first + last).ToUpperInvariant();
-    }
-
-    private static Color CreateAvatarColor( int userId )
-    {
-        int r = (userId * 53) % 120 + 40;
-        int g = (userId * 97) % 120 + 40;
-        int b = (userId * 193) % 120 + 40;
-        return Color.FromRgb( r, g, b );
     }
 }

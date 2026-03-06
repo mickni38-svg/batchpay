@@ -12,6 +12,7 @@
             <Color x:Key="ShellTabBarUnselectedColor">#7B7B7D</Color>
             <Color x:Key="ShellTabBarBackgroundColor">#0F0F10</Color>
             <conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <conv:ReferenceEqualsConverter x:Key="ReferenceEqualsConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

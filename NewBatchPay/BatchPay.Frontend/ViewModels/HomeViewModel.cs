@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BatchPay.Contracts.Dto;
@@ -12,22 +13,28 @@ namespace BatchPay.Frontend.ViewModels;
 public partial class HomeViewModel : ObservableObject
 {
     private readonly BatchPayApiClient _api;
+    private readonly IUserContext _userContext;
 
-    // TODO: senere skal dette komme fra login/session
-    public int CurrentUserId { get; } = 1;
+    public ObservableCollection<UserDto> Users { get; } = new();
 
-    // This list will now contain both Users and Merchants who are friends.
+    [ObservableProperty]
+    private UserDto? selectedUser;
+
+    // (valgfrit) viser at “login virker”
     public ObservableCollection<UserDto> Friends { get; } = new();
 
-    [ObservableProperty]
-    private bool isBusy;
+    [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private string? statusMessage;
 
-    [ObservableProperty]
-    private string? statusMessage;
+    public bool IsLoggedIn => _userContext.CurrentUserId is not null;
 
-    public HomeViewModel(BatchPayApiClient api)
+    public string LoggedInAsText
+    => SelectedUser is null ? "Ikke logget ind" : $"Logget ind som: {SelectedUser.DisplayName}";
+
+    public HomeViewModel( BatchPayApiClient api, IUserContext userContext )
     {
         _api = api;
+        _userContext = userContext;
     }
 
     [RelayCommand]
@@ -37,25 +44,82 @@ public partial class HomeViewModel : ObservableObject
 
         IsBusy = true;
         StatusMessage = null;
-        Friends.Clear();
 
         try
         {
-            // MODIFIED: The API call is simpler and the parameter name is updated.
-            // The returned UserDto list can now contain both users and merchants.
-            var friends = await _api.GetFriendsAsync(CurrentUserId, CancellationToken.None);
-            foreach (var friend in friends)
+            Users.Clear();
+
+            var users = await _api.GetAllUsersAsync( CancellationToken.None );
+            foreach (var u in users.OrderBy( x => x.DisplayName ))
+                Users.Add( u );
+
+            // Hvis der allerede er valgt en bruger (Preferences), så vælg den i dropdown
+            var currentId = _userContext.CurrentUserId;
+            if (currentId is not null)
             {
-                Friends.Add(friend);
+                SelectedUser = Users.FirstOrDefault( x => x.Id == currentId.Value );
+                OnPropertyChanged( nameof( IsLoggedIn ) );
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error loading friends: {ex.Message}";
+            StatusMessage = $"Error loading users: {ex.Message}";
         }
         finally
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    public async Task LoginAsync()
+    {
+        if (IsBusy) return;
+
+        if (SelectedUser is null)
+        {
+            StatusMessage = "Vælg en bruger først.";
+            return;
+        }
+
+        IsBusy = true;
+        StatusMessage = null;
+
+        try
+        {
+            _userContext.CurrentUserId = SelectedUser.Id;
+            OnPropertyChanged( nameof( IsLoggedIn ) );
+
+            // (valgfrit) hent venner for at verificere at alt skifter pr. bruger
+            Friends.Clear();
+            var friends = await _api.GetFriendsAsync( SelectedUser.Id, CancellationToken.None );
+            foreach (var f in friends)
+                Friends.Add( f );
+
+            StatusMessage = $"Logget ind som: {SelectedUser.DisplayName}";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Login failed: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    partial void OnSelectedUserChanged( UserDto? value )
+    {
+        OnPropertyChanged( nameof( LoggedInAsText ) );
+    }
+
+    [RelayCommand]
+    public void Logout()
+    {
+        _userContext.CurrentUserId = null;
+        SelectedUser = null;
+        Friends.Clear();
+        StatusMessage = "Logget ud.";
+        OnPropertyChanged( nameof( IsLoggedIn ) );
     }
 }

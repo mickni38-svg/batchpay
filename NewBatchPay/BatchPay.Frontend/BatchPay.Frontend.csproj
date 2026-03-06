@@ -61,13 +61,10 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 	</ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\BatchPay.Contracts\BatchPay.Contracts.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -115,5 +112,9 @@
         <Color>#512BD4</Color>
         <ForegroundFile>Resources\AppIcon\appiconfg.svg</ForegroundFile>
       </MauiImage>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.1" />
     </ItemGroup>
 </Project>

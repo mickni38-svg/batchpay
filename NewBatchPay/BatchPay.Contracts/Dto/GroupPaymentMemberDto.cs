@@ -4,4 +4,4 @@ public sealed record GroupPaymentMemberDto(
     int MemberId,
     string DisplayName,
     string Handle,
-    byte MemberType);
+    DirectoryEntryType MemberType );

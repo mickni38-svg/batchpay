@@ -7,5 +7,7 @@ public sealed record GroupPaymentDto(
     int CreatedByUserId,
     DateTime CreatedAtUtc,
     string IconKey,
-    IReadOnlyList<UserDto> Members
+    int MerchantId,
+    string MerchantDisplayName,
+    IReadOnlyList<DirectoryEntryDto> Members
 );
